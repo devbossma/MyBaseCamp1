@@ -1,0 +1,124 @@
+<div class="form-container" style="max-width:1000px;">
+  <header style="margin-bottom:1rem;">
+    <h1>Edit Project</h1>
+    <p class="subtitle">Update project details, visibility and tags</p>
+  </header>
+
+  <form action="/projects/<%= @project.id %>" method="post" autocomplete="off">
+    <input type="hidden" name="_method" value="PUT">
+
+    <div style="display:grid; grid-template-columns: 1fr 320px; gap:1rem; align-items:start;">
+
+      <!-- Left column: main editable fields -->
+      <div>
+        <div class="form-group">
+          <label for="name">Project Title</label>
+          <input 
+            type="text" 
+            id="name" 
+            name="project[name]" 
+            required 
+            minlength="3"
+            maxlength="100"
+            placeholder="e.g., Website Redesign, Marketing Campaign"
+            class="form-control"
+            value="<%= @project.name %>"
+            autofocus
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="description">Description</label>
+          <textarea 
+            id="description" 
+            name="project[description]" 
+            rows="6"
+            maxlength="2000"
+            placeholder="Describe what this project is about..."
+            class="form-control"
+          ><%= @project.description %></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="cover_url">Cover image URL (optional)</label>
+          <input type="url" id="cover_url" name="project[cover_url]" class="form-control" placeholder="https://..." value="<%= @project.cover_url || '' %>">
+          <small style="color:var(--text-muted);">A public image URL for a header cover (recommended 1200x360)</small>
+        </div>
+
+        <div class="form-group">
+          <label for="tags">Tags (comma separated)</label>
+          <input type="text" id="tags" name="project[tags]" class="form-control" placeholder="feature,backend,design" value="<%= (@project.tags || []).join(", ") %>">
+          <small style="color:var(--text-muted);">Use tags to categorize projects. Comma separated.</small>
+        </div>
+      </div>
+
+      <!-- Right column: sidebar actions & metadata -->
+      <aside style="position:relative;">
+        <div style="background:var(--surface); padding:1rem; border-radius:10px; border:1px solid var(--border);">
+          <h3 style="margin-bottom:0.5rem;">Project Settings</h3>
+
+          <div class="form-group" style="margin-bottom:0.5rem;">
+            <label for="active">Active</label>
+              <div style="display:flex; align-items:center; gap:0.5rem; margin-top:0.25rem;">
+              <input type="checkbox" id="active" name="project[active]" value="1" <%= 'checked' if @project.active %> >
+              <small style="color:var(--text-muted);">When unchecked the project is archived</small>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="owner">Owner</label>
+            <div style="display:flex; gap:0.5rem; align-items:center;">
+              <div class="avatar-xs" aria-hidden="true" style="width:32px; height:32px; display:flex; align-items:center; justify-content:center; border-radius:6px; background:var(--bg-tertiary);"> <%= h(@project.user.username[0].upcase) if @project.user && @project.user.username %> </div>
+              <div>
+                <div><strong><a href="/users/<%= @project.user.id if @project.user %>"><%= h(@project.user.username) if @project.user %></a></strong></div>
+                <small style="color:var(--text-muted);">Project creator</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="assigned_emails">Assign users (enter emails)</label>
+            <input id="assigned_emails" type="text" name="project[assigned_user_emails]" class="form-control" placeholder="user@example.com, other@example.com" value="">
+            <small style="color:var(--text-muted);">Enter comma-separated emails to add; use the × on existing users to remove them before saving.</small>
+
+            <div id="assignee-chips" style="display:flex; flex-wrap:wrap; gap:0.4rem; margin-top:0.5rem;">
+              <% @project.assigned_users.each do |u| %>
+                <div class="ua-chip" data-user-id="<%= u.id %>" style="display:inline-flex; align-items:center; gap:0.4rem; padding:0.25rem 0.5rem; background:var(--bg-tertiary); border-radius:6px;">
+                  <span><%= h(u.username) %> — <%= h(u.email) %></span>
+                  <button type="button" class="ua-chip-remove" aria-label="Remove <%= h(u.username) %>">×</button>
+                  <input type="hidden" name="project[assigned_user_ids][]" value="<%= u.id %>">
+                </div>
+              <% end %>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:0.5rem; margin-top:1rem;">
+            <button type="submit" class="btn btn-primary">Save changes</button>
+            <a href="/projects/<%= @project.id %>" class="btn btn-ghost">Cancel</a>
+          </div>
+        </div>
+
+        <!-- Delete button removed from inside main form to avoid nested forms -->
+      </aside>
+
+    </div>
+  </form>
+
+    <!-- Small script to allow removing assigned-user chips client-side -->
+    <script>
+      document.addEventListener('click', function(e){
+        var btn = e.target.closest && e.target.closest('.ua-chip-remove');
+        if(!btn) return;
+        var chip = btn.closest('.ua-chip');
+        if(chip) chip.remove();
+      });
+    </script>
+
+  <!-- Delete form must live outside the edit form to avoid nested form behavior -->
+  <div style="max-width:1000px; margin-top:0.75rem;">
+    <form action="/projects/<%= @project.id %>" method="post" onsubmit="return confirm('Delete this project? This action cannot be undone.')">
+      <input type="hidden" name="_method" value="delete">
+      <button type="submit" class="btn btn-danger" style="width:100%;">Delete project</button>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,38 @@
+<div class="form-container">
+  <h1>Create New Project</h1>
+  <p class="subtitle">Start organizing your next big idea</p>
+
+  <form action="/projects" method="post" class="form">
+    <div class="form-group">
+      <label for="title">Project Title</label>
+      <input 
+        type="text" 
+        id="name" 
+        name="name" 
+        required 
+        minlength="3"
+        maxlength="100"
+        placeholder="e.g., Website Redesign, Marketing Campaign"
+        class="form-control"
+        autofocus
+      >
+    </div>
+
+    <div class="form-group">
+      <label for="description">Description (Optional)</label>
+      <textarea 
+        id="description" 
+        name="description" 
+        rows="5"
+        maxlength="1000"
+        placeholder="Describe what this project is about..."
+        class="form-control"
+      ></textarea>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Create Project</button>
+      <a href="/projects" class="btn btn-ghost">Cancel</a>
+    </div>
+  </form>
+</div>

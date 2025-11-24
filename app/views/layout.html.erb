@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BaseCamp - Project Manager</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <header class="header" role="banner">
+    <div class="container header-content">
+      <h1><a href="/">⛺ BaseCamp</a></h1>
+      <nav class="nav">
+        <% if logged_in? %>
+          <span>Welcome, <%= current_user.username %></span>
+          <% if current_user.admin? %>
+            <a href="/admin/users">Admin</a>
+          <% end %>
+          <a href="/projects">Projects</a>
+          <form action="/logout" method="post" style="display: inline;">
+            <button type="submit" class="btn">Logout</button>
+          </form>
+        <% else %>
+          <a href="/login">Login</a>
+          <a href="/register">Register</a>
+        <% end %>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container" role="main">
+    <% if flash[:success] %>
+      <div class="flash success"><%= flash[:success] %></div>
+    <% end %>
+    <% if flash[:error] %>
+      <div class="flash error"><%= flash[:error] %></div>
+    <% end %>
+
+    <%= yield %>
+  </main>
+
+  <footer class="footer">
+  <div class="container" style="padding:2rem 0; text-align:center; color:var(--text-muted); font-size:0.9rem;">
+    <a href="/about" style="color:var(--text-muted); margin-right:1rem;">About</a>
+    <a href="/terms" style="color:var(--text-muted); margin-right:1rem;">Terms</a>
+    <a href="/privacy" style="color:var(--text-muted);">Privacy</a>
+  </div>
+    <div class="container">
+      <p>&copy; 2025 BaseCamp. Built with Sinatra & SQLite.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Auto-dismiss flash messages after 5 seconds
+    setTimeout(() => {
+      document.querySelectorAll('.flash').forEach(flash => {
+        flash.style.opacity = '0';
+        setTimeout(() => flash.remove(), 300);
+      });
+    }, 5000);
+
+    // Confirm delete actions
+    document.querySelectorAll('[data-confirm]').forEach(form => {
+      form.addEventListener('submit', (e) => {
+        if (!confirm(form.dataset.confirm)) {
+          e.preventDefault();
+        }
+      });
+    });
+  </script>
+</body>
+</html>
