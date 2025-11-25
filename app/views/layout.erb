@@ -12,7 +12,9 @@
       <h1><a href="/">⛺ BaseCamp</a></h1>
       <nav class="nav">
         <% if logged_in? %>
-          <span>Welcome, <%= current_user.username %></span>
+          
+          <span>Welcome, <a href="/profile"><%= current_user.username %></a></span>
+          
           <% if current_user.admin? %>
             <a href="/admin/users">Admin</a>
           <% end %>
@@ -55,7 +57,7 @@
     setTimeout(() => {
       document.querySelectorAll('.flash').forEach(flash => {
         flash.style.opacity = '0';
-        setTimeout(() => flash.remove(), 300);
+        setTimeout(() => flash.remove(), 200);
       });
     }, 5000);
 

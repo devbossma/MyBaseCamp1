@@ -1,10 +1,10 @@
+require "json"
 class ApplicationController < Sinatra::Base
   configure do
     set :views, File.expand_path("../../views", __FILE__)
     set :public_folder, File.expand_path("../../../public", __FILE__)
     set :erb, layout: :layout, default_encoding: "utf-8"
     enable :sessions
-    set :session_secret, ENV.fetch("SESSION_SECRET") { SecureRandom.hex(64) }
   end
 
   helpers do
@@ -47,7 +47,6 @@ class ApplicationController < Sinatra::Base
 
     def require_login
       unless logged_in?
-        session[:return_to] = request.path_info
         redirect "/login"
       end
     end
@@ -87,9 +86,9 @@ class ApplicationController < Sinatra::Base
   end
 
   before do
-    @flash = flash
+    # @flash = flash
     # Public routes that should not force a redirect to login
-    pass if request.path == "/login" || request.path == "/register" || request.path == "/" || request.path == "/users/search"
+    pass if request.path == "/login" || request.path == "/register" || request.path == "/" || request.path == "/debug_session"
     require_login
   end
 

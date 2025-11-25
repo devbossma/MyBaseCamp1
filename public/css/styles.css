@@ -109,7 +109,7 @@ small {
    ============================================ */
 
 .container {
-  max-width: 1200px;
+  max-width: 1600px;
   margin: 0 auto;
   padding: 0 1.5rem;
 }
@@ -189,51 +189,180 @@ main {
 /* ============================================
    Flash Messages
    ============================================ */
-
 .flash {
+  position: fixed;
+  top: calc(var(--header-height) + 1rem);
+  right: 1.5rem;
+  z-index: 2000;
   padding: 1rem 1.5rem;
-  border-radius: var(--radius);
-  margin-bottom: 2rem;
+  border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
   gap: 0.75rem;
   font-weight: 500;
-  animation: slideDown 0.3s ease;
-  transition: opacity 0.3s;
+  animation: slideInBounce 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  transition: all 0.3s ease;
   border: 1px solid transparent;
+  box-shadow: var(--shadow-xl);
+  backdrop-filter: blur(8px);
+  max-width: 400px;
+  min-width: 300px;
 }
 
-@keyframes slideDown {
-  from {
+@keyframes slideInBounce {
+  0% {
     opacity: 0;
-    transform: translateY(-10px);
+    transform: translateX(100px) scale(0.8);
   }
-  to {
+  60% {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateX(-10px) scale(1.02);
+  }
+  80% {
+    transform: translateX(5px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+/* Exit animation for when flash is removed */
+.flash.fade-out {
+  animation: slideOut 0.3s ease forwards;
+}
+
+@keyframes slideOut {
+  0% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(100px) scale(0.8);
   }
 }
 
 .flash.success {
-  background: rgba(16, 185, 129, 0.1);
+  background: linear-gradient(135deg, 
+    rgba(16, 185, 129, 0.15) 0%, 
+    rgba(16, 185, 129, 0.1) 100%);
   color: #6ee7b7;
-  border-color: rgba(16, 185, 129, 0.3);
+  border-color: rgba(16, 185, 129, 0.4);
+  border-left: 1px solid rgba(16, 185, 129, 0.8);
 }
 
 .flash.success::before {
   content: "✓";
   font-weight: bold;
+  font-size: 1.1em;
+  background: rgba(16, 185, 129, 0.2);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(16, 185, 129, 0.4);
 }
 
 .flash.error {
-  background: rgba(239, 68, 68, 0.1);
+  background: linear-gradient(135deg, 
+    rgba(239, 68, 68, 0.15) 0%, 
+    rgba(239, 68, 68, 0.1) 100%);
   color: #fca5a5;
-  border-color: rgba(239, 68, 68, 0.3);
+  border-color: rgba(239, 68, 68, 0.4);
+  border-left: 4px solid rgba(239, 68, 68, 0.8);
 }
 
 .flash.error::before {
   content: "✕";
   font-weight: bold;
+  font-size: 1.1em;
+  background: rgba(239, 68, 68, 0.2);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+/* Optional: Add close button */
+.flash .close-btn {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: inherit;
+  opacity: 0.7;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: opacity 0.2s;
+  font-size: 1.2em;
+  line-height: 1;
+}
+
+.flash .close-btn:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .flash {
+    right: 1rem;
+    left: 1rem;
+    max-width: none;
+    min-width: auto;
+  }
+  
+  @keyframes slideInBounce {
+    0% {
+      opacity: 0;
+      transform: translateY(-50px) scale(0.8);
+    }
+    60% {
+      opacity: 1;
+      transform: translateY(10px) scale(1.02);
+    }
+    80% {
+      transform: translateY(-5px) scale(0.98);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+  
+  @keyframes slideOut {
+    0% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-50px) scale(0.8);
+    }
+  }
+}
+
+/* Auto-hide functionality */
+.flash.auto-hide {
+  animation: slideInBounce 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55),
+             autoHide 5s ease forwards;
+}
+
+@keyframes autoHide {
+  0%, 80% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(100px) scale(0.8);
+  }
 }
 
 /* ============================================
@@ -507,7 +636,7 @@ textarea.form-control {
 /* Cover image inside hero */
 .project-hero-cover {
   width: 100%;
-  height: 120px;
+  height: 140px;
   background-size: cover;
   background-position: center;
   border-radius: calc(var(--radius-lg) - 2px);
@@ -589,6 +718,23 @@ textarea.form-control {
   border: 1px solid var(--border);
   box-shadow: var(--shadow);
   margin-bottom: 1rem;
+}
+
+.create-new-project {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+.pagination-info {
+  display: block;
+  text-align: center;
+  color: var(--success) !important;
+  
+  color: var(--text-muted);
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  font-size: 0. ninerem;
 }
 
 .card-header-section {

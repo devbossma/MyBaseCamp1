@@ -1,0 +1,187 @@
+<!-- Profile Hero Section -->
+<div class="project-hero">
+    <div class="project-hero-content container">
+        <div class="project-title-section">
+            <div class="project-id-badge">USER#<%= @user.id %></div>
+            <h1 class="project-title"><%= @user.username %></h1>
+            <div class="project-meta-info">
+                <div class="meta-item">
+                    <span class="meta-icon">📧</span>
+                    <span><%= @user.email %></span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-icon">👤</span>
+                    <span><%= @user.admin? ? 'Administrator' : 'User' %></span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-icon">📅</span>
+                    <span>Joined <%= time_ago(@user.created_at) %></span>
+                </div>
+            </div>
+            <div class="status-badge status-active">Active Account</div>
+        </div>
+        <div class="project-hero-actions">
+            <a href="/profile/edit" class="btn btn-primary">
+                <span class="btn-icon">✏️</span>
+                Edit Profile
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content Layout -->
+<div class="project-layout">
+    <!-- Main Content -->
+    <div class="project-main">
+        <!-- Activity Stats Card -->
+        <div class="content-card">
+            <div class="card-header-section">
+                <h3 class="card-title">
+                    <span class="card-icon">📊</span>
+                    Activity Overview
+                </h3>
+            </div>
+            <div class="info-list">
+                <div class="info-item">
+                    <span>Projects Created</span>
+                    <strong><%= @user.projects.count %></strong>
+                </div>
+                <div class="info-item">
+                    <span>Projects Contributing</span>
+                    <strong><%= @user.contributing_projects.count %></strong>
+                </div>
+                <div class="info-item">
+                    <span>Comments Made</span>
+                    <strong><%= @user.comments.count %></strong>
+                </div>
+                <div class="info-item">
+                    <span>Last Active</span>
+                    <span><%= time_ago(@user.updated_at) %></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Projects Card -->
+        <div class="content-card">
+            <div class="card-header-section">
+                <h3 class="card-title">
+                    <span class="card-icon">🚀</span>
+                    Recent Projects
+                </h3>
+                <span class="card-badge"><%= @user.projects.limit(5).count %> active</span>
+            </div>
+            
+            <% if @user.projects.any? %>
+                <div class="projects-grid" style="grid-template-columns: 1fr; gap: 1rem;">
+                    <% @user.projects.limit(5).each do |project| %>
+                        <div class="card">
+                            <h3>
+                                <a href="/projects/<%= project.id %>"><%= project.name %></a>
+                            </h3>
+                            <p><%= project.description %></p>
+                            <div class="project-meta-info">
+                                <div class="meta-item">
+                                    <span class="meta-icon">👥</span>
+                                    <span><%= project.contributors.count %> contributors</span>
+                                </div>
+                                <div class="meta-item">
+                                    <span class="meta-icon">💬</span>
+                                    <span><%= project.comments.count %> comments</span>
+                                </div>
+                                <div class="meta-item">
+                                    <span class="meta-icon">📅</span>
+                                    <span>Updated <%= time_ago(project.updated_at) %></span>
+                                </div>
+                            </div>
+                            <div class="project-actions">
+                                <a href="/projects/<%= project.id %>" class="btn btn-sm btn-outline">View Project</a>
+                                <% if can?(:edit, project) %>
+                                    <a href="/projects/<%= project.id %>/edit" class="btn btn-sm btn-ghost">Edit</a>
+                                <% end %>
+                            </div>
+                        </div>
+                    <% end %>
+                </div>
+                <% if @user.projects.count > 5 %>
+                    <div style="text-align: center; margin-top: 1rem;">
+                        <a href="/projects?user=<%= @user.id %>" class="btn btn-outline">View All Projects</a>
+                    </div>
+                <% end %>
+            <% else %>
+                <div class="empty-content">
+                    <div class="empty-icon">📁</div>
+                    <p class="empty-text">No projects created yet</p>
+                    <a href="/projects/new" class="btn btn-primary" style="margin-top: 1rem;">Create First Project</a>
+                </div>
+            <% end %>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="project-sidebar">
+        <!-- Account Info Card -->
+        <div class="sidebar-card">
+            <h3 class="sidebar-title">Account Information</h3>
+            <div class="info-list">
+                <div class="info-item">
+                    <span>User ID</span>
+                    <code class="project-id">#<%= @user.id %></code>
+                </div>
+                <div class="info-item">
+                    <span>Role</span>
+                    <span class="status-badge <%= @user.admin? ? 'status-active' : 'status-inactive' %>">
+                        <%= @user.admin? ? 'Administrator' : 'Standard User' %>
+                    </span>
+                </div>
+                <div class="info-item">
+                    <span>Member Since</span>
+                    <span><%= @user.created_at.strftime("%b %d, %Y") %></span>
+                </div>
+                <div class="info-item">
+                    <span>Last Updated</span>
+                    <span><%= @user.updated_at.strftime("%b %d, %Y") %></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions Card -->
+        <div class="sidebar-card">
+            <h3 class="sidebar-title">Quick Actions</h3>
+            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                <a href="/projects/new" class="btn btn-block btn-primary">
+                    <span class="btn-icon">➕</span>
+                    New Project
+                </a>
+                <a href="/profile/edit" class="btn btn-block btn-outline">
+                    <span class="btn-icon">⚙️</span>
+                    Edit Profile
+                </a>
+                <% if @user.admin? %>
+                    <a href="/admin/users" class="btn btn-block btn-ghost">
+                        <span class="btn-icon">👥</span>
+                        Manage Users
+                    </a>
+                <% end %>
+            </div>
+        </div>
+
+        <!-- Security Card -->
+        <div class="sidebar-card">
+            <h3 class="sidebar-title">Security</h3>
+            <div class="info-list">
+                <div class="info-item">
+                    <span>Password</span>
+                    <span>••••••••</span>
+                </div>
+                <div class="info-item">
+                    <span>2FA</span>
+                    <span class="status-badge status-inactive">Disabled</span>
+                </div>
+            </div>
+            <a href="/profile/security" class="btn btn-block btn-outline" style="margin-top: 1rem;">
+                <span class="btn-icon">🔒</span>
+                Security Settings
+            </a>
+        </div>
+    </div>
+</div>

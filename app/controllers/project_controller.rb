@@ -1,4 +1,4 @@
-class ProjectsController < ApplicationController
+class ProjectController < ApplicationController
   get "/projects" do
     @projects = current_user.all_projects.order(created_at: :desc)
     erb :"projects/index"
@@ -47,7 +47,7 @@ class ProjectsController < ApplicationController
         Array(desired_ids).map(&:to_i)
       end
 
-      if desired && desired.any?
+      if desired&.any?
         current = @project.assigned_users.pluck(:id)
         to_add = desired - current
         to_remove = current - desired
@@ -60,10 +60,6 @@ class ProjectsController < ApplicationController
           ProjectAssignment.where(project_id: @project.id, user_id: to_remove).delete_all
         end
       end
-
-      puts "[DEBUG] POST created project attrs: #{@project.attributes.slice("id", "name", "cover_url", "active", "tags")}" if defined?(puts)
-      puts "[DEBUG] POST assigned_user_ids: #{@project.assigned_user_ids.inspect}" if defined?(puts)
-
       redirect_with_flash("/projects/#{@project.id}", :success, "Project Created Successfully, #{@project.name}!")
     else
       flash[:error] = @project.errors.full_messages.join(", ")
@@ -131,7 +127,7 @@ class ProjectsController < ApplicationController
           Array(desired_ids).map(&:to_i)
         end
 
-        if desired && desired.any?
+        if desired&.any?
           current = @project.assigned_users.pluck(:id)
 
           to_add = desired - current

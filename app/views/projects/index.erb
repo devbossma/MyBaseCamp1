@@ -121,7 +121,13 @@
         <% end %>
       </tbody>
     </table>
+    <span class="pagination-info">Showing <%= @projects.count %> project<%= 's' if @projects.count != 1 %></span> 
   </div>
+  <span class="create-new-project">
+      <a href="/projects/new" class="btn btn-primary">
+        <span class="btn-icon">+</span> New Project
+      </a>
+  </span>
 <% else %>
   <div class="empty-state">
     <div class="empty-icon">📋</div>

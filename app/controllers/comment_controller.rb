@@ -1,4 +1,4 @@
-class CommentsController < ApplicationController
+class CommentController < ApplicationController
   post "/projects/:project_id/comments" do
     project = Project.find_by(id: params[:project_id])
 

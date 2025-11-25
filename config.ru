@@ -7,6 +7,7 @@ end
 use Rack::MethodOverride
 run ApplicationController
 use AuthController
-use ProjectsController
-use CommentsController
+use ProjectController
+use CommentController
 use AdminController
+use UserController
