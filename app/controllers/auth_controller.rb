@@ -19,7 +19,7 @@ class AuthController < ApplicationController
   end
 
   post "/register" do
-    unless params[:password_confirmation] == params[:password]
+    unless (params[:password_confirmation] == params[:password])
       redirect_with_flash("/register", :error, "Please confirm both passwords are identicL!")
     end
 

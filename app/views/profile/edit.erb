@@ -17,7 +17,7 @@
 
         <!-- Basic Information Section -->
         <h3 style="margin-bottom: 1.5rem; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
-            <span class="card-icon">👤</span>
+            <i class="fa-solid fa-id-card"></i>
             Basic Information
         </h3>
 
@@ -27,7 +27,7 @@
                 <%= @user.username[0].upcase %>
             </div>
             <button type="button" class="btn btn-outline btn-sm">
-                <span class="btn-icon">🖼️</span>
+                <i class="fa-solid fa-camera-rotate"></i>
                 Change Avatar
             </button>
         </div>
@@ -64,7 +64,7 @@
 
         <!-- Profile Information Section -->
         <h3 style="margin: 2.5rem 0 1.5rem 0; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
-            <span class="card-icon">📝</span>
+            <i class="fa-solid fa-id-card-clip"></i>
             Profile Information
         </h3>
 
@@ -83,7 +83,7 @@
 
         <!-- Preferences Section -->
         <h3 style="margin: 2.5rem 0 1.5rem 0; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
-            <span class="card-icon">⚙️</span>
+            <i class="fa-solid fa-list-check"></i>
             Preferences
         </h3>
 
@@ -134,7 +134,7 @@
         <!-- Action Buttons -->
         <div style="display: flex; gap: 1rem; margin-top: 2rem;">
             <button type="submit" class="btn btn-primary btn-block">
-                <span class="btn-icon">💾</span>
+                <i class="fa-solid fa-floppy-disk"></i>
                 Save Changes
             </button>
             <a href="/profile" class="btn btn-outline btn-block">
@@ -157,8 +157,8 @@
                 <form action="/profile/delete" method="POST" style="margin: 0;">
                     <input type="hidden" name="_method" value="DELETE">
                     <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete your account? This action cannot be undone.')">
-                        <span class="btn-icon">🗑️</span>
-                        Delete Account
+                        <i class="fa-solid fa-user-slash"></i>
+                        Delete
                     </button>
                 </form>
             </div>
