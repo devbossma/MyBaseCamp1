@@ -203,7 +203,7 @@ class ProjectController < ApplicationController
     elsif tags_raw.is_a?(Array)
       tags_raw.map(&:to_s).join(", ")
     else
-      nil
+      return
     end
 
     assigned = fetch.call("assigned_user_ids")
@@ -242,5 +242,17 @@ class ProjectController < ApplicationController
       tags: tags_val,
       assigned_user_ids: assigned_ids
     }
+  end
+
+  def project_status_badge(project)
+    return unless project
+    if project.respond_to?(:active)
+      status_class = project.active ? "status-active" : "status-inactive"
+      status_text = project.active ? "Active" : "Inactive"
+    else
+      status_class = "status-active"
+      status_text = "Active"
+    end
+    "<span class='status-badge #{status_class}'>#{status_text}</span>"
   end
 end

@@ -1,5 +1,4 @@
 class AdminController < ApplicationController
-
   get "/admin/users" do
     require_admin
     @users = User.all.order(created_at: :desc)

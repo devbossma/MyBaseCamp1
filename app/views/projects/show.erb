@@ -24,7 +24,7 @@
             <circle cx="10" cy="7" r="4" stroke="currentColor" stroke-width="2"/>
             <path d="M3 18C3 14 6 11 10 11C14 11 17 14 17 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
           </svg>
-          <span>Created by <a href="/users/<%= @project.user.id %>" class="meta-link"><%= @project.user.username %></a></span>
+          <span>Created by <a href="/profile/<%= @project.user.id %>" class="meta-link"><%= @project.user.username %></a></span>
         </div>
         
         <div class="meta-item">
@@ -94,7 +94,7 @@
           <svg class="card-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
             linecap="round" stroke-linejoin="round"/>
                   </svg>
-                  Description
+                  Descriptiontag
                 </h2>
                 </div>
                 
@@ -194,10 +194,7 @@
                 
                 <div class="info-list">
                 <div class="info-item">
-                  <%# Status badge (falls back to Active if no `active` attribute) %>
-      <% status_class = @project.respond_to?(:active) ? (@project.active ? 'status-active' : 'status-inactive') : 'status-active' %>
-      <% status_text = @project.respond_to?(:active) ? (@project.active ? 'Active' : 'Inactive') : 'Active' %>
-      <span class="status-badge <%= status_class %>"><%= status_text %></span>
+                  <%= project_status_badge(@project) %>
                 </div>
                 
                 <div class="info-item">

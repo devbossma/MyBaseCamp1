@@ -29,6 +29,10 @@ class ApplicationController < Sinatra::Base
       return false unless logged_in?
 
       case action
+      when :manage_profile
+        if resource? && params[:id]
+          current_user.id == params[:id]
+        end
       when :manage_users
         current_user.admin?
       when :edit, :destroy

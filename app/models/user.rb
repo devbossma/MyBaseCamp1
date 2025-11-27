@@ -25,6 +25,10 @@ class User < ActiveRecord::Base
     admin? || project.user_id == id || project.assigned_users.exists?(id)
   end
 
+  def can_manage_profile?(profile)
+    admin? || profile.user_id == id
+  end
+
   def owns?(project)
     project.user_id == id
   end
@@ -46,5 +50,4 @@ class User < ActiveRecord::Base
   def downcase_email
     self.email = email.downcase
   end
-  
 end

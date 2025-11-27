@@ -104,7 +104,7 @@ small {
 
 .container {
   max-width: 1400px;
-  /* margin: 0 auto; */
+  margin: 0 2rem;
   padding: 0 2rem;
 }
 
@@ -940,7 +940,14 @@ textarea.form-control {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 1.5rem;
-  margin-top: 2rem;
+  margin-top: 2rem, 10%;
+}
+
+.avatars-group {   
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
 }
 
 .project-hero {

@@ -1,0 +1,163 @@
+<div class="form-container">
+    <div style="text-align: center; margin-bottom: 2rem;">
+        <h1>Security Settings</h1>
+        <p class="subtitle">Manage your account security and password</p>
+    </div>
+
+    <!-- Change Password Form -->
+    <form action="/profile/security" method="POST" class="form">
+        <h3 style="margin-bottom: 1.5rem; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fa-solid fa-lock"></i>
+            Change Password
+        </h3>
+
+        <!-- Current Password -->
+        <div class="form-group">
+            <label for="current_password">Current Password</label>
+            <input type="password" 
+                    id="current_password" 
+                    name="current_password" 
+                    class="form-control" 
+                    required
+                    placeholder="Enter your current password"
+                    minlength="6">
+        </div>
+
+        <!-- New Password -->
+        <div class="form-group">
+            <label for="new_password">New Password</label>
+            <input type="password" 
+                    id="new_password" 
+                    name="new_password" 
+                    class="form-control" 
+                    required
+                    placeholder="Enter your new password"
+                    minlength="8">
+            <small style="color: var(--text-muted); margin-top: 0.25rem; display: block;">
+                Must be at least 8 characters long
+            </small>
+        </div>
+
+        <!-- Confirm New Password -->
+        <div class="form-group">
+            <label for="confirm_password">Confirm New Password</label>
+            <input type="password" 
+                    id="confirm_password" 
+                    name="confirm_password" 
+                    class="form-control" 
+                    required
+                    placeholder="Confirm your new password"
+                    minlength="8">
+        </div>
+
+        <!-- Password Strength Meter -->
+        <div class="form-group">
+            <label>Password Strength</label>
+            <div style="height: 6px; background: var(--bg-tertiary); border-radius: 3px; margin-top: 0.5rem; overflow: hidden;">
+                <div style="height: 100%; width: 0%; background: var(--danger); transition: all 0.3s;" id="password-strength"></div>
+            </div>
+            <small style="color: var(--text-muted); margin-top: 0.25rem; display: block;" id="password-feedback">
+                Enter a password to check strength
+            </small>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" style="margin-top: 1rem;">
+            <i class="fa-solid fa-key"></i>
+            Update Password
+        </button>
+    </form>
+
+    <!-- Two-Factor Authentication -->
+    <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border);">
+        <h3 style="margin-bottom: 1.5rem; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fa-solid fa-shield-halved"></i>
+            Two-Factor Authentication
+        </h3>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1.5rem; background: var(--bg-secondary); border-radius: var(--radius); border: 1px solid var(--border);">
+            <div>
+                <strong style="color: var(--text-primary);">Two-Factor Authentication</strong>
+                <p style="color: var(--text-muted); margin: 0.25rem 0 0 0; font-size: 0.9rem;">
+                    Add an extra layer of security to your account
+                </p>
+            </div>
+            <div>
+                <span class="status-badge status-inactive">Disabled</span>
+            </div>
+        </div>
+
+        <div style="margin-top: 1rem;">
+            <button type="button" class="btn btn-outline btn-block" onclick="alert('2FA setup will be available soon!')">
+                <i class="fa-solid fa-qrcode"></i>
+                Enable 2FA
+            </button>
+        </div>
+    </div>
+
+    <!-- Session Management -->
+    <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border);">
+        <h3 style="margin-bottom: 1.5rem; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fa-solid fa-computer"></i>
+            Active Sessions
+        </h3>
+
+        <!-- Current Session -->
+        <div style="background: var(--bg-secondary); padding: 1.5rem; border-radius: var(--radius); border: 1px solid var(--primary); margin-bottom: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div style="flex: 1;">
+                    <strong style="color: var(--text-primary);">Current Session</strong>
+                    <p style="color: var(--text-muted); margin: 0.5rem 0 0 0; font-size: 0.9rem;">
+                        <%= request.user_agent.split('(').first.strip %> • <%= request.ip %>
+                    </p>
+                    <p style="color: var(--text-muted); margin: 0.25rem 0 0 0; font-size: 0.8rem;">
+                        Started just now
+                    </p>
+                </div>
+                <span class="status-badge status-active">Active</span>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 1rem;">
+            <button type="button" class="btn btn-outline" onclick="alert('This will log you out of all other devices!')">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                Sign Out All Other Devices
+            </button>
+        </div>
+    </div>
+
+    <!-- Account Security -->
+    <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border);">
+        <h3 style="margin-bottom: 1.5rem; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fa-solid fa-user-shield"></i>
+            Account Security
+        </h3>
+
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: var(--bg-secondary); border-radius: var(--radius); border: 1px solid var(--border);">
+                <div>
+                    <strong style="color: var(--text-primary);">Last Password Change</strong>
+                    <p style="color: var(--text-muted); margin: 0.25rem 0 0 0; font-size: 0.9rem;">
+                        <%= current_user.updated_at.strftime("%B %d, %Y at %H:%M") %>
+                    </p>
+                </div>
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: var(--bg-secondary); border-radius: var(--radius); border: 1px solid var(--border);">
+                <div>
+                    <strong style="color: var(--text-primary);">Account Created</strong>
+                    <p style="color: var(--text-muted); margin: 0.25rem 0 0 0; font-size: 0.9rem;">
+                        <%= current_user.created_at.strftime("%B %d, %Y") %>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Back -->
+    <div style="text-align: center; margin-top: 3rem;">
+        <a href="/profile" class="btn btn-ghost">
+            <i class="fa-solid fa-arrow-left"></i>
+            Back to Profile
+        </a>
+    </div>
+</div>

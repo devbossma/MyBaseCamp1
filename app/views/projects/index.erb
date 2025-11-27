@@ -5,6 +5,7 @@
         <tr>
           <th class="col-id">#ID</th>
           <th class="col-name">Project Name</th>
+          <th class="col-status">Status</th>
           <th class="col-description">Description</th>
           <th class="col-contributors">Contributors</th>
           <th class="col-comments">Comments</th>
@@ -25,6 +26,10 @@
                 <%= project.name %>
               </a>
             </td>
+            <!-- Project Status Column -->
+            <td class="col-status" data-label="Status">
+                  <%= project_status_badge(project) %>
+            </td>
 
             <!-- Description Column -->
             <td class="col-description" data-label="Description">
@@ -37,7 +42,6 @@
             <td class="col-contributors" data-label="Contributors">
               <div class="contributors-list">
                 <% 
-                  # Get unique contributors (project owner + any assigned users)
                   contributors = ([project.user] + project.assigned_users.to_a).uniq { |u| u.id }
                   contributors_count = contributors.length
                 %>

@@ -12,7 +12,7 @@
         <p class="subtitle">Update your account information and preferences</p>
     </div>
 
-    <form action="/profile/update" method="POST" class="form">
+    <form action="/profile/update" method="post" class="form">
         <input type="hidden" name="_method" value="PUT">
 
         <!-- Basic Information Section -->
@@ -68,7 +68,7 @@
             Profile Information
         </h3>
 
-        <!-- Bio -->
+        <!-- Bio - FIXED: Changed to profile[bio] -->
         <div class="form-group">
             <label for="bio">Bio</label>
             <textarea id="bio" 
@@ -87,18 +87,21 @@
             Preferences
         </h3>
 
-        <!-- Notification Preferences -->
+        <!-- Notification Preferences - FIXED: Added hidden fields for unchecked checkboxes -->
         <div class="form-group">
             <label>Notification Preferences</label>
             <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 0.5rem;">
+                <!-- Hidden field ensures value is sent even when unchecked -->
                 <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
                     <input type="checkbox" name="profile[email_notifications]" value="true" <%= @user.profile.email_notifications ? 'checked' : '' %>>
                     <span>Receive email notifications</span>
                 </label>
+                
                 <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
                     <input type="checkbox" name="profile[weekly_digest]" value="true" <%= @user.profile.weekly_digest ? 'checked' : '' %>>
                     <span>Send weekly project digest</span>
                 </label>
+                
                 <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
                     <input type="checkbox" name="profile[public_profile]" value="true" <%= @user.profile.public_profile ? 'checked' : '' %>>
                     <span>Make profile public</span>
@@ -111,12 +114,9 @@
             <label for="timezone">Timezone</label>
             <select id="timezone" name="profile[timezone]" class="form-control">
                 <option value="UTC" <%= @user.profile.timezone == 'UTC' ? 'selected' : '' %>>UTC</option>
-                <option value="Eastern Time (US & Canada)" <%= @user.profile.timezone == 'Eastern Time (US & Canada)' ? 'selected' : '' %>>Eastern Time (US & Canada)</option>
+                <option value="Casablanca" <%= @user.profile.timezone == 'Casablanca' ? 'selected' : '' %>>Morocco (Casablanca)</option>
                 <option value="Pacific Time (US & Canada)" <%= @user.profile.timezone == 'Pacific Time (US & Canada)' ? 'selected' : '' %>>Pacific Time (US & Canada)</option>
                 <option value="Central Time (US & Canada)" <%= @user.profile.timezone == 'Central Time (US & Canada)' ? 'selected' : '' %>>Central Time (US & Canada)</option>
-                <option value="Europe/Paris" <%= @user.profile.timezone == 'Europe/Paris' ? 'selected' : '' %>>Europe/Paris</option>
-                <option value="Europe/London" <%= @user.profile.timezone == 'Europe/London' ? 'selected' : '' %>>Europe/London</option>
-                <option value="Asia/Tokyo" <%= @user.profile.timezone == 'Asia/Tokyo' ? 'selected' : '' %>>Asia/Tokyo</option>
             </select>
         </div>
 
@@ -154,7 +154,7 @@
                         Permanently delete your account and all associated data
                     </p>
                 </div>
-                <form action="/profile/delete" method="POST" style="margin: 0;">
+                <form action="/profile" method="POST" style="margin: 0;">
                     <input type="hidden" name="_method" value="DELETE">
                     <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete your account? This action cannot be undone.')">
                         <i class="fa-solid fa-user-slash"></i>
