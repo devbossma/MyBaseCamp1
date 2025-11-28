@@ -8,6 +8,10 @@ class AuthController < ApplicationController
 
     if user&.authenticate(params[:password])
       session[:user_id] = user.id
+      if user.admin?
+        redirect_with_flash("/admin", :success, "Welcome back, #{user.username}!")
+      end
+
       redirect_with_flash("/profile", :success, "Welcome back, #{user.username}!")
     else
       redirect_with_flash("/login", :error, "Invalid email or password")

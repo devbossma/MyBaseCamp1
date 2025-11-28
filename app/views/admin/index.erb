@@ -1,0 +1,322 @@
+<!-- Breadcrumb Navigation -->
+<nav class="breadcrumb">
+  <a href="/">Home</a>
+  <span class="breadcrumb-separator">/</span>
+  <span class="breadcrumb-current">Admin Dashboard</span>
+</nav>
+
+<!-- Admin Header -->
+<div class="admin-header">
+  <div class="admin-header-content">
+    <div class="admin-title-section">
+      <div class="admin-badge">
+        <i class="fa-solid fa-shield-halved"></i>
+        Admin Dashboard
+      </div>
+      <h1 class="admin-title">System Overview</h1>
+      <p class="admin-subtitle">Monitor and manage your Basecamp platform</p>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="admin-stats">
+      <div class="stat-card">
+        <div class="stat-icon stat-icon-primary">
+          <i class="fa-solid fa-users"></i>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value"><%= @users_count %></div>
+          <div class="stat-label">Total Users</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon stat-icon-success">
+          <i class="fa-solid fa-diagram-project"></i>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value"><%= @projects_count %></div>
+          <div class="stat-label">Active Projects</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon stat-icon-info">
+          <i class="fa-solid fa-comments"></i>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value"><%= @comments_count %></div>
+          <div class="stat-label">Comments</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon stat-icon-warning">
+          <i class="fa-solid fa-chart-line"></i>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value"><%= @growth_rate %>%</div>
+          <div class="stat-label">Growth (30d)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Metrics Section -->
+<div class="dashboard-fullwidth">
+  <!-- Performance Metrics -->
+  <div class="dashboard-card">
+    <div class="card-header">
+      <h3 class="card-title">
+        <i class="fa-solid fa-gauge-high"></i>
+        Performance Metrics
+      </h3>
+      <div class="time-filter">
+        <button class="time-filter-btn active">24H</button>
+        <button class="time-filter-btn">7D</button>
+        <button class="time-filter-btn">30D</button>
+      </div>
+    </div>
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-header">
+          <i class="fa-solid fa-eye"></i>
+          <span>Page Views</span>
+        </div>
+        <div class="metric-value">2,847</div>
+        <div class="metric-change positive">
+          <i class="fa-solid fa-arrow-up"></i>
+          12.4%
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-header">
+          <i class="fa-solid fa-user-check"></i>
+          <span>Active Users</span>
+        </div>
+        <div class="metric-value">184</div>
+        <div class="metric-change positive">
+          <i class="fa-solid fa-arrow-up"></i>
+          8.2%
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-header">
+          <i class="fa-solid fa-download"></i>
+          <span>New Signups</span>
+        </div>
+        <div class="metric-value">23</div>
+        <div class="metric-change positive">
+          <i class="fa-solid fa-arrow-up"></i>
+          5.7%
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-header">
+          <i class="fa-solid fa-message"></i>
+          <span>Comments</span>
+        </div>
+        <div class="metric-value">156</div>
+        <div class="metric-change negative">
+          <i class="fa-solid fa-arrow-down"></i>
+          2.1%
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!-- Dashboard Grid -->
+<div class="dashboard-grid">
+  <!-- Left Column -->
+  <div class="dashboard-column">
+    <!-- Recent Activity -->
+    <div class="dashboard-card">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="fa-solid fa-clock-rotate-left"></i>
+          Recent Activity
+        </h3>
+        <a href="/admin/activity" class="btn-link">View All</a>
+      </div>
+      <div class="activity-feed">
+        <% if @recent_activity.any? %>
+          <% @recent_activity.each do |activity| %>
+            <div class="activity-item">
+              <div class="activity-avatar">
+                <%= activity[:user_initial] %>
+              </div>
+              <div class="activity-content">
+                <div class="activity-text">
+                  <strong><%= activity[:username] %></strong> <%= activity[:action] %>
+                </div>
+                <div class="activity-time">
+                  <i class="fa-solid fa-clock"></i>
+                  <%= activity[:time] %>
+                </div>
+              </div>
+              <div class="activity-badge <%= activity[:type] %>">
+                <i class="<%= activity[:icon] %>"></i>
+              </div>
+            </div>
+          <% end %>
+        <% else %>
+          <div class="empty-state-mini">
+            <i class="fa-solid fa-inbox"></i>
+            <p>No recent activity</p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- System Health -->
+    <div class="dashboard-card">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="fa-solid fa-heart-pulse"></i>
+          System Health
+        </h3>
+        <span class="status-badge status-active">All Systems Operational</span>
+      </div>
+      <div class="health-metrics">
+        <div class="metric">
+          <div class="metric-info">
+            <span class="metric-label">Server Uptime</span>
+            <span class="metric-value">99.9%</span>
+          </div>
+          <div class="metric-bar">
+            <div class="metric-progress" style="width: 99.9%"></div>
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-info">
+            <span class="metric-label">Database</span>
+            <span class="metric-value">Healthy</span>
+          </div>
+          <div class="metric-bar">
+            <div class="metric-progress success" style="width: 100%"></div>
+          </div>
+        </div>
+        <div class="metric">
+          <div class="metric-info">
+            <span class="metric-label">Response Time</span>
+            <span class="metric-value">142ms</span>
+          </div>
+          <div class="metric-bar">
+            <div class="metric-progress" style="width: 95%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Column -->
+  <div class="dashboard-column">
+    <!-- Quick Actions -->
+    <div class="dashboard-card">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="fa-solid fa-bolt"></i>
+          Quick Actions
+        </h3>
+      </div>
+      <div class="quick-actions">
+  <!-- Most common actions first -->
+  <a href="/admin/users/new" class="quick-action">
+    <div class="action-icon user-create">
+      <i class="fa-solid fa-user-plus"></i>
+    </div>
+    <div class="action-content">
+      <strong>Create User</strong>
+      <span>Add new user account</span>
+    </div>
+    <i class="fa-solid fa-chevron-right action-arrow"></i>
+  </a>
+
+  <a href="/projects/new" class="quick-action">
+    <div class="action-icon project-create">
+      <i class="fa-solid fa-plus"></i>
+    </div>
+    <div class="action-content">
+      <strong>Create Project</strong>
+      <span>Start a new project</span>
+    </div>
+    <i class="fa-solid fa-chevron-right action-arrow"></i>
+  </a>
+
+  <a href="/admin/users" class="quick-action">
+    <div class="action-icon user-management">
+      <i class="fa-solid fa-users-gear"></i>
+    </div>
+    <div class="action-content">
+      <strong>User Management</strong>
+      <span>Manage users & permissions</span>
+    </div>
+    <i class="fa-solid fa-chevron-right action-arrow"></i>
+  </a>
+
+  <!-- Less frequent actions -->
+  <a href="/admin/settings" class="quick-action">
+    <div class="action-icon settings">
+      <i class="fa-solid fa-sliders"></i>
+    </div>
+    <div class="action-content">
+      <strong>System Settings</strong>
+      <span>Configure platform</span>
+    </div>
+    <i class="fa-solid fa-chevron-right action-arrow"></i>
+  </a>
+
+  <a href="/admin/analytics" class="quick-action">
+    <div class="action-icon analytics">
+      <i class="fa-solid fa-chart-simple"></i>
+    </div>
+    <div class="action-content">
+      <strong>Analytics</strong>
+      <span>View usage statistics</span>
+    </div>
+    <i class="fa-solid fa-chevron-right action-arrow"></i>
+  </a>
+</div>
+    </div>
+
+    <!-- Recent Users -->
+    <div class="dashboard-card">
+      <div class="card-header">
+        <h3 class="card-title">
+          <i class="fa-solid fa-user-plus"></i>
+          Recent Signups
+        </h3>
+        <a href="/admin/users" class="btn-link">View All</a>
+      </div>
+      <div class="recent-users">
+        <% if @recent_users.any? %>
+          <% @recent_users.each do |user| %>
+            <div class="user-card">
+              <div class="user-avatar">
+                <%= user.username[0].upcase %>
+              </div>
+              <div class="user-info">
+                <strong><%= user.username %></strong>
+                <span class="user-email"><%= user.email %></span>
+              </div>
+              <div class="user-meta">
+                <span class="user-time"><%= time_ago(user.created_at) %></span>
+                <% if user.admin? %>
+                  <span class="user-badge admin">Admin</span>
+                <% else %>
+                  <span class="user-badge">User</span>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        <% else %>
+          <div class="empty-state-mini">
+            <i class="fa-solid fa-user-clock"></i>
+            <p>No recent signups</p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+</div>

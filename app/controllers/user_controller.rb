@@ -13,12 +13,6 @@ class UserController < ApplicationController
     erb :"profile/edit"
   end
 
-  get "/user/data" do
-    content_type :json
-    current_user.profile.to_json
-    current_user.to_json
-  end
-
   get "/profile/security" do
     erb :"profile/security"
   end
@@ -56,7 +50,7 @@ class UserController < ApplicationController
     if @user.update(password: new_password)
       redirect_with_flash("/profile/security", :success, "Password updated successfully!")
     else
-      redirect_with_flash("/profile/security", :error, "Failed to update password: #{@user.errors.full_messages.join(', ')}")
+      redirect_with_flash("/profile/security", :error, "Failed to update password: #{@user.errors.full_messages.join(", ")}")
     end
   end
 
@@ -130,6 +124,18 @@ class UserController < ApplicationController
     redirect_with_flash("/register", :success, "Your account has been deleted")
   end
 
+  delete "/profile/:id" do
+
+    unless current_user.admin?
+      session.clear
+      redirect "/errors/403"
+    end
+
+    user = User.find_by(id: params[:id])
+    deleted = user.username
+    user.destroy
+    redirect_with_flash("/admin/users", :success, "The #{deleted}'s Account Has Been Deleted Successfully")
+  end
 
   private
 

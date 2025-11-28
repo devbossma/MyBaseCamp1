@@ -31,7 +31,7 @@ class ProjectController < ApplicationController
     end
 
     @project = current_user.projects.new(
-      name: project_params[:name],
+      name: project_params[:name] || params[:name],
       description: project_params[:description],
       cover_url: project_params[:cover_url],
       active: project_params[:active]
@@ -157,9 +157,9 @@ class ProjectController < ApplicationController
 
     if project && (current_user.admin? || project.user_id == current_user.id)
       project.destroy
-      flash[:success] = "Project deleted successfully"
+      redirect_with_flash("/projects", :success, "Project deleted successfully")
     else
-      flash[:error] = "Project not found or access denied"
+      redirect_with_flash("/projects/#{project.id}", :error, "Project not found or access denied")
     end
 
     redirect "/"
@@ -203,7 +203,7 @@ class ProjectController < ApplicationController
     elsif tags_raw.is_a?(Array)
       tags_raw.map(&:to_s).join(", ")
     else
-      return
+      nil
     end
 
     assigned = fetch.call("assigned_user_ids")
