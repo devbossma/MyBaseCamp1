@@ -12,7 +12,7 @@ class AuthController < ApplicationController
         redirect_with_flash("/admin", :success, "Welcome back, #{user.username}!")
       end
 
-      redirect_with_flash("/profile", :success, "Welcome back, #{user.username}!")
+      redirect_with_flash("/projects", :success, "Welcome back, #{user.username}!")
     else
       redirect_with_flash("/login", :error, "Invalid email or password")
     end

@@ -21,7 +21,7 @@
         </div>
         <div class="project-hero-actions">
             <% if @current_user.can_manage_profile?(@user.profile) %>
-                <a href="/profile/edit" class="btn btn-primary">
+                <a href="/admin/users/<%= @user.id %>/edit" class="btn btn-primary">
                     <i class="fa-solid fa-user-pen"></i>
                     Edit Profile
                 </a>
@@ -115,13 +115,7 @@
                                 </div>
                                 <div class="meta-item">
                                     <i class="fa-solid fa-comments"></i>
-                                    <span><%= project.comments.count %> <%= project.comments.count == 1 ? 'comment' : 'comments' %></span>
-                                    <% if unread_comments_count(project) > 0 %>
-                                        <span class="notification-badge" title="<%= unread_comments_count(project) %> unread">
-                                            <i class="fa-solid fa-bell"></i>
-                                            <%= unread_comments_count(project) %> new
-                                        </span>
-                                    <% end %>
+                                    <span><%= project.comments.count %> comments</span>
                                 </div>
                                 <div class="meta-item">
                                     <i class="fa-solid fa-calendar-days"></i>
@@ -177,44 +171,6 @@
                     <span><%= @user.updated_at.strftime("%b %d, %Y") %></span>
                 </div>
             </div>
-        </div>
-
-        <!-- Quick Actions Card -->
-        <div class="sidebar-card">
-            <h3 class="sidebar-title">Quick Actions</h3>
-            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-                <a href="/projects/new" class="btn btn-block btn-primary">
-                    <i class="fa-solid fa-circle-plus"></i>
-                    New Project
-                </a>
-                <% if @user.admin? %>
-                    <a href="/admin/users" class="btn btn-block btn-ghost">
-                        <i class="fa-solid fa-user-gear"></i>
-                        Manage Users
-                    </a>
-                <% end %>
-            </div>
-        </div>
-
-        <!-- Security Card -->
-        <div class="sidebar-card">
-            <h3 class="sidebar-title">Security</h3>
-            <div class="info-list">
-                <div class="info-item">
-                    <i class="fa-solid fa-eye"></i>
-                    <span>Password</span>
-                    <span>••••••••</span>
-                </div>
-                <div class="info-item">
-                    <i class="fa-solid fa-key"></i>
-                    <span>2FA</span>
-                    <span class="status-badge status-inactive">Disabled</span>
-                </div>
-            </div>
-            <a href="/profile/security" class="btn btn-block btn-outline" style="margin-top: 1rem;">
-                <i class="fa-solid fa-user-shield"></i>
-                Security Settings
-            </a>
         </div>
     </div>
     <% end %>

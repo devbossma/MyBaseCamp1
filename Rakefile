@@ -3,16 +3,16 @@ require "sinatra/activerecord/rake"
 
 desc "Start the application"
 task :server do
-  if ENV["RACK_ENV"] == "develepment"
-    sh "bundle exec puma -p 9292 config.ru"
+  if ENV["RACK_ENV"] == "production"
+    sh "bundle exec puma -p 8080 config.ru"
   else
-    sh "bundle exec rerun --background --ignore 'db/*' --ignore 'log/*' --pattern '**/*.{rb,ru,erb}' 'bundle exec puma -p 9292 config.ru'"
+    sh "bundle exec rerun --background --ignore 'db/*' --ignore 'log/*' --pattern '**/*.{rb,ru,erb}' 'bundle exec puma -p 4567 config.ru'"
   end
 end
 
 desc "Start simple server (no auto-reload)"
 task :simple_server do
-  sh "bundle exec puma -p 9292 config.ru"
+  sh "bundle exec puma -p 4567 config.ru"
 end
 
 desc "Open console"

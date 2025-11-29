@@ -1,0 +1,81 @@
+<!-- Breadcrumb Navigation -->
+<nav class="breadcrumb" aria-label="Breadcrumb">
+  <a href="/">Home</a>
+  <span class="breadcrumb-separator">/</span>
+  <a href="/projects">Projects</a>
+  <span class="breadcrumb-separator">/</span>
+  <a href="/projects/<%= @project.id %>"><%= @project.name %></a>
+  <span class="breadcrumb-separator">/</span>
+  <span class="breadcrumb-current">Edit Comment</span>
+</nav>
+
+<div class="form-container">
+  <div style="text-align: center; margin-bottom: 2rem;">
+    <h1>Edit Comment</h1>
+    <p class="subtitle">Update your comment on <strong><%= h(@project.name) %></strong></p>
+  </div>
+
+  <form action="/projects/<%= @project.id %>/comments/<%= @comment.id %>" method="POST" class="form">
+    <!-- Hidden field for PUT method override -->
+    <input type="hidden" name="_method" value="PUT">
+
+    <div class="form-group">
+      <label for="content">Comment</label>
+      <textarea 
+        id="content" 
+        name="content" 
+        class="form-control" 
+        rows="6" 
+        required
+        placeholder="Write your comment..."
+        style="resize: vertical; min-height: 120px;"><%= h(@comment.content) %></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="attachment">Attachment URL (optional)</label>
+      <input 
+        type="text" 
+        id="attachment" 
+        name="attachment" 
+        class="form-control" 
+        placeholder="https://example.com/file.pdf"
+        value="<%= h(@comment.attachment) %>">
+      <small style="color: var(--text-muted); margin-top: 0.25rem; display: block;">
+        Link to an external file or resource
+      </small>
+    </div>
+
+    <div class="sidebar-card" style="margin-top: 1.5rem; background: var(--card-bg-secondary, #f8f9fa);">
+      <h4 style="margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-muted);">Comment Information</h4>
+      <div class="info-list">
+        <div class="info-item">
+          <span>Author</span>
+          <span><%= h(@comment.user.username) %></span>
+        </div>
+        <div class="info-item">
+          <span>Posted</span>
+          <span><%= @comment.created_at.strftime("%b %d, %Y at %I:%M %p") %></span>
+        </div>
+        <% if @comment.updated_at != @comment.created_at %>
+          <div class="info-item">
+            <span>Last Edited</span>
+            <span><%= @comment.updated_at.strftime("%b %d, %Y at %I:%M %p") %></span>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+      <button type="submit" class="btn btn-primary btn-block">
+        <svg width="16" height="16" viewBox="0 0 20 20" fill="none" style="margin-right: 0.25rem;">
+          <path d="M3 17V14L12 5L15 8L6 17H3Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M10 7L13 10" stroke="currentColor" stroke-width="2"/>
+        </svg>
+        Update Comment
+      </button>
+      <a href="/projects/<%= @project.id %>#comment-<%= @comment.id %>" class="btn btn-outline btn-block">
+        Cancel
+      </a>
+    </div>
+  </form>
+</div>

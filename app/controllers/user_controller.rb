@@ -55,7 +55,6 @@ class UserController < ApplicationController
   end
 
   put "/profile/update" do
-
     @user = current_user
     @profile = @user.profile
     begin
@@ -70,9 +69,9 @@ class UserController < ApplicationController
         profile_updated = @profile.update(
           bio: params.dig(:profile, :bio),
           # If checkbox is checked, value is "true", otherwise nil
-          email_notifications: params.dig(:profile, :email_notifications) == 'true',
-          weekly_digest: params.dig(:profile, :weekly_digest) == 'true',
-          public_profile: params.dig(:profile, :public_profile) == 'true',
+          email_notifications: params.dig(:profile, :email_notifications) == "true",
+          weekly_digest: params.dig(:profile, :weekly_digest) == "true",
+          public_profile: params.dig(:profile, :public_profile) == "true",
           timezone: params.dig(:profile, :timezone),
           language: params.dig(:profile, :language)
         )
@@ -91,6 +90,10 @@ class UserController < ApplicationController
   get "/profile/:id" do
     @user = User.find_by(id: params[:id])
     @current_user = current_user
+
+    if @current_user.admin?
+      redirect "/admin/users/#{@user.id}"
+    end
 
     unless @user
       redirect_with_flash("/errors/404", :error, "User Not found")
@@ -125,7 +128,6 @@ class UserController < ApplicationController
   end
 
   delete "/profile/:id" do
-
     unless current_user.admin?
       session.clear
       redirect "/errors/403"

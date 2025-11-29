@@ -1,4 +1,3 @@
-require "json"
 class ApplicationController < Sinatra::Base
   configure do
     set :views, File.expand_path("../../views", __FILE__)
@@ -7,19 +6,16 @@ class ApplicationController < Sinatra::Base
     enable :sessions
   end
 
+  require_relative "../helpers/comment_helpers"
+  require_relative "../helpers/project_helpers"
+  require_relative "../helpers/time_helpers"
+  require_relative "../helpers/pagination_helpers"
+
   helpers do
-    def time_ago(time)
-      seconds = Time.now - time
-      case seconds
-      when 0..59 then "just now"
-      when 60..3599 then "#{(seconds / 60).to_i} minutes ago"
-      when 3600..86399 then "#{(seconds / 3600).to_i} hours ago"
-      when 86400..604799 then "#{(seconds / 86400).to_i} days ago"
-      else time.strftime("%B %d, %Y")
-      end
-    rescue
-      time.strftime("%B %d, %Y")
-    end
+    include CommentHelpers
+    include ProjectHelpers
+    include TimeHelpers
+    include PaginationHelpers
 
     def current_user
       @current_user ||= User.find_by(id: session[:user_id]) if session[:user_id]
@@ -57,8 +53,7 @@ class ApplicationController < Sinatra::Base
 
     def require_admin
       unless current_user&.admin?
-        flash[:error] = "Admin access required"
-        redirect "/"
+        redirect_with_flash("/", :error, "Admin access required")
       end
     end
 
@@ -116,5 +111,11 @@ class ApplicationController < Sinatra::Base
     erb :"errors/500"
   rescue
     "500 - Internal Server Error"
+  end
+
+  error do
+    erb :"errors/403"
+  rescue
+    "403 - You do not have permission to view this page. Not an admin"
   end
 end

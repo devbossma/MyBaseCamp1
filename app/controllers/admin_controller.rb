@@ -8,6 +8,9 @@
 #   GET  /admin/users              - List all users
 #   GET  /admin/users/new          - New user creation form
 #   POST /admin/users              - Create a new user
+#   GET  /admin/users/:id          - View user details
+#   GET  /admin/users/:id/edit     - Edit user form
+#   PUT  /admin/users/:id          - Update a user
 #   POST /admin/users/:id/promote  - Promote a user to admin role
 #   POST /admin/users/:id/demote   - Demote a user from admin role
 #
@@ -27,6 +30,7 @@ class AdminController < ApplicationController
   #
   # @return [String] Rendered admin/index.erb template
   get "/admin" do
+    require_admin
     # Aggregate statistics for the dashboard widgets
     @users_count = User.count       # Total registered users
     @projects_count = Project.count # Total projects in the system
@@ -66,7 +70,7 @@ class AdminController < ApplicationController
   get "/admin/users" do
     require_admin
     @users = User.all.order(created_at: :desc)
-    erb :"admin/users"
+    erb :"admin/users/index"
   end
 
   # GET /admin/users/new - New User Form
@@ -111,8 +115,101 @@ class AdminController < ApplicationController
       redirect_with_flash("/admin/users", :success, "User created successfully!")
     else
       # Display validation errors and re-render the form
-      flash[:error] = "Failed to create user: #{user.errors.full_messages.join(", ")}"
+      redirect_with_flash("/admin/users", :error, "Failed to create user: #{user.errors.full_messages.join(", ")}")
       erb :"admin/users/new"
+    end
+  end
+
+  # GET /admin/users/:id - Show User Details
+  #
+  # Displays detailed information about a specific user.
+  # Requires admin privileges.
+  #
+  # @param id [Integer] The ID of the user to view (URL parameter)
+  #
+  # @require_admin Ensures only administrators can access this route
+  # @return [String] Rendered admin/users/show.erb template
+  # @return [Redirect] Redirects to /admin/users if user not found
+  get "/admin/users/:id" do
+    require_admin
+    @user = User.find_by(id: params[:id])
+
+    unless @user
+      redirect_with_flash("/admin/users", :error, "User not found")
+    end
+
+    erb :"admin/users/show"
+  end
+
+  # GET /admin/users/:id/edit - Edit User Form
+  #
+  # Renders the form for editing an existing user's account details.
+  # Requires admin privileges.
+  #
+  # @param id [Integer] The ID of the user to edit (URL parameter)
+  #
+  # @require_admin Ensures only administrators can access this route
+  # @return [String] Rendered admin/users/edit.erb template
+  # @return [Redirect] Redirects to /admin/users if user not found
+  get "/admin/users/:id/edit" do
+    require_admin
+    @user = User.find_by(id: params[:id])
+
+    unless @user
+      redirect_with_flash("/admin/users", :error, "User not found")
+    end
+
+    erb :"admin/users/edit"
+  end
+
+  # PUT /admin/users/:id - Update User
+  #
+  # Processes the edit user form submission and updates the user account.
+  # Requires admin privileges. Handles password updates only when provided.
+  #
+  # @param id [Integer] The ID of the user to update (URL parameter)
+  # @param username [String] The unique username for the user
+  # @param email [String] The user's email address
+  # @param password [String] Optional new password (only updated if provided)
+  # @param admin [String] "true" if user should have admin privileges
+  #
+  # @require_admin Ensures only administrators can access this route
+  # @return [Redirect] Redirects to /admin/users/:id on success with flash message
+  # @return [String] Re-renders edit form on validation failure with error messages
+  # @note Prevents self-demotion to avoid admin lockout
+  put "/admin/users/:id" do
+    require_admin
+    @user = User.find_by(id: params[:id])
+
+    # Handle non-existent user
+    unless @user
+      redirect_with_flash("/admin/users", :error, "User not found")
+    end
+
+    # Build update attributes hash
+    update_attrs = {
+      username: params[:username],
+      email: params[:email]
+    }
+
+    # Only update password if a new one is provided
+    update_attrs[:password] = params[:password] if params[:password] && !params[:password].empty?
+
+    # Handle admin status change with self-demotion protection
+    new_admin_status = params[:admin] == "true"
+    if @user.id == current_user.id && @user.admin? && !new_admin_status
+      redirect_with_flash("/admin/users", :error, "You cannot remove your own admin privileges")
+      flash[:error] = "You cannot remove your own admin privileges"
+    else
+      update_attrs[:admin] = new_admin_status
+
+      # Attempt to update and handle success/failure
+      if @user.update(update_attrs)
+        redirect_with_flash("/admin/users/#{@user.id}", :success, "User updated successfully!")
+      else
+        flash[:error] = "Failed to update user: #{@user.errors.full_messages.join(", ")}"
+        erb :"admin/users/edit"
+      end
     end
   end
 

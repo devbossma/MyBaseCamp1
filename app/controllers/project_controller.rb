@@ -1,6 +1,12 @@
 class ProjectController < ApplicationController
   get "/projects" do
-    @projects = current_user.all_projects.order(created_at: :desc)
+    page = params[:page] || 1
+    per_page = params[:per_page] || 5
+
+    projects_query = current_user.all_projects.order(created_at: :desc)
+    @pagination = paginate(projects_query, page: page, per_page: per_page)
+    @projects = @pagination[:records]
+
     erb :"projects/index"
   end
 
@@ -120,14 +126,13 @@ class ProjectController < ApplicationController
       @project.tags = project_params[:tags] if project_params[:tags]
 
       if @project.save
-        # prefer explicit assigned_user_ids param, otherwise use resolved emails
-        desired = if project_params[:assigned_user_ids]&.any?
-          Array(project_params[:assigned_user_ids]).map(&:to_i)
-        else
-          Array(desired_ids).map(&:to_i)
-        end
+        # Merge both sources: existing assigned_user_ids from chips + new emails from input
+        existing_ids = Array(project_params[:assigned_user_ids]).map(&:to_i)
+        new_ids = Array(desired_ids).map(&:to_i)
+        desired = (existing_ids + new_ids).uniq
 
-        if desired&.any?
+        # Update assignments even if desired is empty (to remove all assignments)
+        if !desired_ids.nil? || !project_params[:assigned_user_ids].nil?
           current = @project.assigned_users.pluck(:id)
 
           to_add = desired - current
@@ -242,17 +247,5 @@ class ProjectController < ApplicationController
       tags: tags_val,
       assigned_user_ids: assigned_ids
     }
-  end
-
-  def project_status_badge(project)
-    return unless project
-    if project.respond_to?(:active)
-      status_class = project.active ? "status-active" : "status-inactive"
-      status_text = project.active ? "Active" : "Inactive"
-    else
-      status_class = "status-active"
-      status_text = "Active"
-    end
-    "<span class='status-badge #{status_class}'>#{status_text}</span>"
   end
 end

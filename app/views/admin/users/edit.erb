@@ -6,16 +6,21 @@
   <span class="breadcrumb-separator">/</span>
   <a href="/admin/users">Users</a>
   <span class="breadcrumb-separator">/</span>
-  <span class="breadcrumb-current">Create User</span>
+  <a href="/admin/users/<%= @user.id %>"><%= @user.username %></a>
+  <span class="breadcrumb-separator">/</span>
+  <span class="breadcrumb-current">Edit</span>
 </nav>
 
 <div class="form-container">
   <div style="text-align: center; margin-bottom: 2rem;">
-    <h1>Create New User</h1>
-    <p class="subtitle">Add a new user account to the system</p>
+    <h1>Edit User</h1>
+    <p class="subtitle">Update account details for <strong><%= @user.username %></strong></p>
   </div>
 
-  <form action="/admin/users" method="POST" class="form">
+  <form action="/admin/users/<%= @user.id %>" method="POST" class="form">
+    <!-- Hidden field for PUT method override -->
+    <input type="hidden" name="_method" value="PUT">
+
     <div class="form-group">
       <label for="username">Username</label>
       <input type="text" 
@@ -23,7 +28,8 @@
              name="username" 
              class="form-control" 
              required
-             placeholder="Enter username">
+             placeholder="Enter username"
+             value="<%= @user.username %>">
     </div>
 
     <div class="form-group">
@@ -33,20 +39,20 @@
              name="email" 
              class="form-control" 
              required
-             placeholder="Enter email address">
+             placeholder="Enter email address"
+             value="<%= @user.email %>">
     </div>
 
     <div class="form-group">
-      <label for="password">Password</label>
+      <label for="password">New Password</label>
       <input type="password" 
              id="new_password" 
              name="password" 
              class="form-control" 
-             required
-             placeholder="Enter password"
+             placeholder="Leave blank to keep current password"
              minlength="8">
       <small style="color: var(--text-muted); margin-top: 0.25rem; display: block;">
-        Must be at least 8 characters long
+        Leave empty to keep the current password. New password must be at least 8 characters.
       </small>
       <!-- Password Strength Meter -->
         <div class="form-group">
@@ -64,22 +70,46 @@
       <label>Role</label>
       <div style="display: flex; gap: 1rem; margin-top: 0.5rem;">
         <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
-          <input type="radio" name="admin" value="false" checked>
+          <input type="radio" name="admin" value="false" <%= @user.admin? ? '' : 'checked' %>>
           <span>Standard User</span>
         </label>
         <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
-          <input type="radio" name="admin" value="true">
+          <input type="radio" name="admin" value="true" <%= @user.admin? ? 'checked' : '' %>>
           <span>Administrator</span>
         </label>
+      </div>
+      <% if @user.id == @current_user.id && @user.admin? %>
+        <small style="color: var(--warning); margin-top: 0.5rem; display: block;">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          You cannot remove your own admin privileges.
+        </small>
+      <% end %>
+    </div>
+
+    <div class="sidebar-card" style="margin-top: 1.5rem; background: var(--bg-secondary, #f8f9fa);">
+      <h4 style="margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-muted);">Account Information</h4>
+      <div class="info-list">
+        <div class="info-item">
+          <span>User ID</span>
+          <code class="project-id">#<%= @user.id %></code>
+        </div>
+        <div class="info-item">
+          <span>Created</span>
+          <span><%= @user.created_at.strftime("%b %d, %Y at %I:%M %p") %></span>
+        </div>
+        <div class="info-item">
+          <span>Last Updated</span>
+          <span><%= @user.updated_at.strftime("%b %d, %Y at %I:%M %p") %></span>
+        </div>
       </div>
     </div>
 
     <div style="display: flex; gap: 1rem; margin-top: 2rem;">
       <button type="submit" class="btn btn-primary btn-block">
-        <i class="fa-solid fa-user-plus"></i>
-        Create User
+        <i class="fa-solid fa-floppy-disk"></i>
+        Save Changes
       </button>
-      <a href="/admin/users" class="btn btn-outline btn-block">
+      <a href="/admin/users/<%= @user.id %>" class="btn btn-outline btn-block">
         Cancel
       </a>
     </div>

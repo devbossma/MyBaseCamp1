@@ -70,7 +70,7 @@
             <div style="display:flex; gap:0.5rem; align-items:center;">
               <div class="avatar-xs" aria-hidden="true" style="width:32px; height:32px; display:flex; align-items:center; justify-content:center; border-radius:6px; background:var(--bg-tertiary);"> <%= h(@project.user.username[0].upcase) if @project.user && @project.user.username %> </div>
               <div>
-                <div><strong><a href="/users/<%= @project.user.id if @project.user %>"><%= h(@project.user.username) if @project.user %></a></strong></div>
+                <div><strong><a href="/profile/<%= @project.user.id if @project.user %>"><%= h(@project.user.username) if @project.user %></a></strong></div>
                 <small style="color:var(--text-muted);">Project creator</small>
               </div>
             </div>
@@ -85,7 +85,9 @@
               <% @project.assigned_users.each do |u| %>
                 <div class="ua-chip" data-user-id="<%= u.id %>" style="display:inline-flex; align-items:center; gap:0.4rem; padding:0.25rem 0.5rem; background:var(--bg-tertiary); border-radius:6px;">
                   <span><%= h(u.username) %> — <%= h(u.email) %></span>
+                  <% if current_user.owns?(@project) || current_user.admin? %>
                   <button type="button" class="ua-chip-remove" aria-label="Remove <%= h(u.username) %>">×</button>
+                  <% end %> 
                   <input type="hidden" name="project[assigned_user_ids][]" value="<%= u.id %>">
                 </div>
               <% end %>
@@ -97,8 +99,6 @@
             <a href="/projects/<%= @project.id %>" class="btn btn-ghost">Cancel</a>
           </div>
         </div>
-
-        <!-- Delete button removed from inside main form to avoid nested forms -->
       </aside>
 
     </div>
@@ -115,10 +115,12 @@
     </script>
 
   <!-- Delete form must live outside the edit form to avoid nested form behavior -->
+  <% if current_user.owns?(@project) || current_user.admin? %>
   <div style="max-width:1000px; margin-top:0.75rem;">
     <form action="/projects/<%= @project.id %>" method="post" onsubmit="return confirm('Delete this project? This action cannot be undone.')">
       <input type="hidden" name="_method" value="delete">
       <button type="submit" class="btn btn-danger delete-project" style="width:100%;">Delete project</button>
     </form>
   </div>
+  <% end %>
 </div>
