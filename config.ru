@@ -9,5 +9,8 @@ run ApplicationController
 use AuthController
 use ProjectController
 use CommentController
+use AttachmentController
+use ThreadController
+use MessageController
 use AdminController
 use UserController

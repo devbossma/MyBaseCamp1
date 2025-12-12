@@ -3,6 +3,8 @@ class Project < ActiveRecord::Base
   has_many :project_assignments, dependent: :destroy
   has_many :assigned_users, through: :project_assignments, source: :user
   has_many :comments, dependent: :destroy
+  has_many :attachments, dependent: :destroy
+  has_many :threads, class_name: "ProjectThread", dependent: :destroy
 
   validates :name, presence: true
   # Tags are stored as JSON in a text column. Provide safe accessors

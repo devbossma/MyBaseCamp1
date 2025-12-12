@@ -1,0 +1,142 @@
+<!-- Breadcrumb Navigation -->
+<nav class="breadcrumb" aria-label="Breadcrumb">
+  <a href="/">Home</a>
+  <span class="breadcrumb-separator">/</span>
+  <a href="/projects">Projects</a>
+  <span class="breadcrumb-separator">/</span>
+  <a href="/projects/<%= @project.id %>"><%= h(@project.name) %></a>
+  <span class="breadcrumb-separator">/</span>
+  <span class="breadcrumb-current"><%= h(@thread.title) %></span>
+</nav>
+
+<header class="project-hero" role="region" aria-label="Thread overview">
+  <div class="project-hero-content">
+    <div class="project-title-section">
+      <h1 class="project-title"><%= h(@thread.title) %></h1>
+      <p class="project-subtitle"><%= h(@thread.description.to_s) %></p>
+      <div class="project-meta-info">
+        <div class="meta-item">
+          <span>In project </span>
+          <a href="/projects/<%= @project.id %>" class="meta-link"><%= h(@project.name) %></a>
+        </div>
+        <div class="meta-item">
+          <span>Started by </span>
+          <a href="/profile/<%= @thread.user.id %>" class="meta-link"><%= h(@thread.user.username) %></a>
+        </div>
+        <div class="meta-item">
+          <span><%= time_ago(@thread.created_at) %></span>
+        </div>
+        <% if @thread.locked %>
+          <div class="meta-item">
+            <span class="status-badge status-inactive">Locked</span>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="project-hero-actions" aria-hidden="false">
+      <div class="action-group">
+        <a href="/projects/<%= @project.id %>" class="btn btn-ghost">Back to Project</a>
+        <% if current_user.admin? || current_user.id == @project.user_id %>
+          <a href="/projects/<%= @project.id %>/threads/<%= @thread.id %>/edit" class="btn btn-primary">Edit Thread</a>
+          <form action="/projects/<%= @project.id %>/threads/<%= @thread.id %>" method="POST" style="display:inline;" onsubmit="return confirm('Delete this thread and all its messages?');">
+            <input type="hidden" name="_method" value="DELETE">
+            <button type="submit" class="btn btn-danger">Delete Thread</button>
+          </form>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="content-card" id="messages">
+  <div class="card-header-section">
+    <h2 class="card-title">Messages</h2>
+    <span class="card-badge"><%= @messages.size %> <%= @@thread.messages.size == 1 ? "message" : "messages" %></span>
+  </div>
+
+  <div class="card-content">
+    <% if @messages.any? %>
+      <div class="comments-list" style="display:flex; flex-direction:column; gap:1rem;">
+        <% @messages.each do |message| %>
+          <% can_manage_message = current_user.admin? || current_user.id == @project.user_id || current_user.id == message.user_id %>
+          <div id="message-<%= message.id %>" class="comment-item" style="display:flex; gap:0.75rem; padding:1rem; background:var(--bg-secondary); border-radius:var(--radius-lg); border:1px solid var(--border); scroll-margin-top:100px;">
+            <div class="avatar-sm" style="flex-shrink:0;">
+              <%= h(message.user.username[0].upcase) %>
+            </div>
+            <div class="comment-content" style="flex:1; min-width:0;">
+              <div class="comment-header" style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.5rem;">
+                <div>
+                  <a href="/profile/<%= message.user.id %>" class="comment-author" style="font-weight:600; color:var(--text-primary); text-decoration:none;">
+                    <%= h(message.user.username) %>
+                  </a>
+                  <span class="comment-time" style="color:var(--text-muted); font-size:0.8rem; margin-left:0.5rem;">
+                    <%= time_ago(message.created_at) %>
+                    <% if message.edited_at.present? %>
+                      <span style="font-style:italic;">(edited)</span>
+                    <% end %>
+                  </span>
+                </div>
+                <% if can_manage_message %>
+                  <div class="comment-actions" style="display:flex; gap:0.5rem;">
+                    <a href="/projects/<%= @project.id %>/threads/<%= @thread.id %>/messages/<%= message.id %>/edit" class="btn btn-ghost btn-sm" title="Edit message">Edit</a>
+                    <form action="/projects/<%= @project.id %>/threads/<%= @thread.id %>/messages/<%= message.id %>" method="POST" style="display:inline;" onsubmit="return confirm('Delete this message?');">
+                      <input type="hidden" name="_method" value="DELETE">
+                      <button type="submit" class="btn btn-ghost btn-sm" style="color:var(--danger);" title="Delete message">Delete</button>
+                    </form>
+                  </div>
+                <% end %>
+              </div>
+
+              <div class="comment-body" style="color:var(--text-secondary); line-height:1.6; word-wrap:break-word;">
+                <%= simple_format(h(message.content)) %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="empty-content" style="text-align:center; padding:2rem;">
+        <p class="empty-text" style="color:var(--text-muted); margin-bottom:0.5rem;">No messages yet</p>
+        <p class="empty-hint" style="color:var(--text-muted); font-size:0.875rem;">Start the conversation!</p>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<% if current_user.can_manage?(@project) %>
+  <div class="content-card" id="new-message" style="margin-top:1.5rem;">
+    <div class="card-header-section">
+      <h2 class="card-title">Post a message</h2>
+      <% if @thread.locked %>
+        <span class="card-badge" style="background:rgba(239,68,68,0.1); color:#fca5a5; border:1px solid rgba(239,68,68,0.3);">Locked</span>
+      <% end %>
+    </div>
+
+    <div class="card-content">
+      <% if @thread.locked %>
+        <p class="empty-text" style="color:var(--text-muted);">This thread is locked. No new messages can be posted.</p>
+      <% else %>
+        <form action="/projects/<%= @project.id %>/threads/<%= @thread.id %>/messages" method="POST" class="comment-form">
+          <div class="comment-input-wrapper" style="display:flex; gap:0.75rem;">
+            <div class="avatar-sm" style="flex-shrink:0;">
+              <%= current_user.username[0].upcase %>
+            </div>
+            <div style="flex:1;">
+              <textarea
+                name="message[content]"
+                placeholder="Write your message..."
+                class="form-control"
+                rows="4"
+                required
+                style="width:100%; resize:vertical; min-height:80px;"></textarea>
+              <div style="display:flex; justify-content:flex-end; margin-top:0.75rem;">
+                <button type="submit" class="btn btn-primary">Post Message</button>
+              </div>
+            </div>
+          </div>
+        </form>
+      <% end %>
+    </div>
+  </div>
+<% end %>

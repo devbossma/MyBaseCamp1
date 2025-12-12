@@ -78,6 +78,8 @@ class ProjectController < ApplicationController
 
     if @project && current_user.can_manage?(@project)
       @comments = @project.comments.includes(:user).order(created_at: :desc)
+      @attachments = @project.attachments.includes(:user).order(created_at: :desc)
+      @threads = @project.threads.includes(:user).pinned_first
       erb :"projects/show"
     else
       flash[:error] = "Project not found or access denied"

@@ -1,0 +1,57 @@
+<!-- Breadcrumb Navigation -->
+<nav class="breadcrumb" aria-label="Breadcrumb">
+  <a href="/">Home</a>
+  <span class="breadcrumb-separator">/</span>
+  <a href="/projects">Projects</a>
+  <span class="breadcrumb-separator">/</span>
+  <a href="/projects/<%= @project.id %>"><%= h(@project.name) %></a>
+  <span class="breadcrumb-separator">/</span>
+  <span class="breadcrumb-current">Edit Thread</span>
+</nav>
+
+<div class="form-container">
+  <div style="text-align: center; margin-bottom: 2rem;">
+    <h1>Edit Thread</h1>
+    <p class="subtitle">Update discussion for <strong><%= h(@project.name) %></strong></p>
+  </div>
+
+  <form action="/projects/<%= @project.id %>/threads/<%= @thread.id %>" method="POST" class="form">
+    <input type="hidden" name="_method" value="PUT">
+
+    <div class="form-group">
+      <label for="thread_title">Title</label>
+      <input
+        type="text"
+        id="thread_title"
+        name="thread[title]"
+        class="form-control"
+        required
+        value="<%= h(@thread.title) %>">
+    </div>
+
+    <div class="form-group">
+      <label for="thread_description">Description</label>
+      <textarea
+        id="thread_description"
+        name="thread[description]"
+        class="form-control"
+        rows="5"><%= h(@thread.description.to_s) %></textarea>
+    </div>
+
+    <div class="form-group" style="display:flex; gap:1.5rem; align-items:center;">
+      <label class="checkbox-inline">
+        <input type="checkbox" name="thread[pinned]" value="1" <%= @thread.pinned ? "checked" : "" %>>
+        Pinned (show at top)
+      </label>
+      <label class="checkbox-inline">
+        <input type="checkbox" name="thread[locked]" value="1" <%= @thread.locked ? "checked" : "" %>>
+        Locked (no new messages)
+      </label>
+    </div>
+
+    <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+      <button type="submit" class="btn btn-primary btn-block">Update Thread</button>
+      <a href="/projects/<%= @project.id %>/threads/<%= @thread.id %>" class="btn btn-outline btn-block">Cancel</a>
+    </div>
+  </form>
+</div>

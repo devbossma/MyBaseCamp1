@@ -10,7 +10,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2025_11_29_001500) do
+ActiveRecord::Schema.define(version: 2025_12_12_004120) do
+
+  create_table "attachments", force: :cascade do |t|
+    t.string "filename", null: false
+    t.string "file_path", null: false
+    t.string "content_type"
+    t.integer "file_size"
+    t.integer "user_id", null: false
+    t.integer "project_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["project_id"], name: "index_attachments_on_project_id"
+    t.index ["user_id"], name: "index_attachments_on_user_id"
+  end
 
   create_table "comments", force: :cascade do |t|
     t.text "content", null: false
@@ -23,6 +36,19 @@ ActiveRecord::Schema.define(version: 2025_11_29_001500) do
     t.index ["project_id", "read"], name: "index_comments_on_project_and_read"
     t.index ["project_id"], name: "index_comments_on_project_id"
     t.index ["user_id"], name: "index_comments_on_user_id"
+  end
+
+  create_table "messages", force: :cascade do |t|
+    t.text "content", null: false
+    t.integer "thread_id", null: false
+    t.integer "user_id", null: false
+    t.integer "parent_message_id"
+    t.datetime "edited_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["parent_message_id"], name: "index_messages_on_parent_message_id"
+    t.index ["thread_id"], name: "index_messages_on_thread_id"
+    t.index ["user_id"], name: "index_messages_on_user_id"
   end
 
   create_table "profiles", force: :cascade do |t|
@@ -62,6 +88,19 @@ ActiveRecord::Schema.define(version: 2025_11_29_001500) do
     t.index ["user_id"], name: "index_projects_on_user_id"
   end
 
+  create_table "threads", force: :cascade do |t|
+    t.string "title", null: false
+    t.text "description"
+    t.integer "project_id", null: false
+    t.integer "user_id", null: false
+    t.boolean "pinned", default: false
+    t.boolean "locked", default: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["project_id"], name: "index_threads_on_project_id"
+    t.index ["user_id"], name: "index_threads_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "username", null: false
     t.string "email", null: false
@@ -73,10 +112,16 @@ ActiveRecord::Schema.define(version: 2025_11_29_001500) do
     t.index ["username"], name: "index_users_on_username", unique: true
   end
 
+  add_foreign_key "attachments", "projects"
+  add_foreign_key "attachments", "users"
   add_foreign_key "comments", "projects", on_delete: :cascade
   add_foreign_key "comments", "users"
+  add_foreign_key "messages", "threads"
+  add_foreign_key "messages", "users"
   add_foreign_key "profiles", "users"
   add_foreign_key "project_assignments", "projects"
   add_foreign_key "project_assignments", "users"
   add_foreign_key "projects", "users"
+  add_foreign_key "threads", "projects"
+  add_foreign_key "threads", "users"
 end

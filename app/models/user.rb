@@ -6,6 +6,9 @@ class User < ActiveRecord::Base
   has_many :project_assignments, dependent: :destroy
   has_many :assigned_projects, through: :project_assignments, source: :project, dependent: :destroy
   has_many :comments, dependent: :destroy
+  has_many :attachments, dependent: :destroy
+  has_many :threads, class_name: "ProjectThread", dependent: :destroy
+  has_many :messages, dependent: :destroy
 
   validates :username, presence: true, uniqueness: true
   validates :email, presence: true, uniqueness: true

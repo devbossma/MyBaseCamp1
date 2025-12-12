@@ -157,6 +157,113 @@
                 </div>
                 </div>
               </div>
+
+<!-- Attachments Section -->
+<div class="content-card" id="attachments">
+  <div class="card-header-section">
+    <h2 class="card-title">
+      <svg class="card-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path d="M7 4L13 4C14.1046 4 15 4.89543 15 6V14C15 15.1046 14.1046 16 13 16H7C5.89543 16 5 15.1046 5 14V6C5 4.89543 5.89543 4 7 4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M9 8H11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      Attachments
+    </h2>
+  </div>
+  <div class="card-content">
+    <% if current_user.can_manage?(@project) %>
+      <form action="/projects/<%= @project.id %>/attachments" method="POST" enctype="multipart/form-data" style="margin-bottom:1rem; display:flex; gap:0.75rem; align-items:center;">
+        <input type="file" name="file" required class="form-control" style="flex:1;" />
+        <button type="submit" class="btn btn-primary">Upload File</button>
+      </form>
+    <% end %>
+
+    <% if @attachments && @attachments.any? %>
+      <div class="attachments-list">
+        <% @attachments.each do |attachment| %>
+          <% can_delete = current_user.admin? || current_user.id == @project.user_id || current_user.id == attachment.user_id %>
+          <div class="attachment-item" style="display:flex; justify-content:space-between; align-items:center; padding:0.75rem 0; border-bottom:1px solid var(--border);">
+            <div>
+              <div style="font-weight:500;">
+                <a href="<%= attachment.file_path %>" target="_blank" rel="noopener noreferrer"><%= h(attachment.filename) %></a>
+              </div>
+              <div style="font-size:0.8rem; color:var(--text-muted);">
+                Uploaded by <%= h(attachment.user.username) %> • <%= time_ago(attachment.created_at) %>
+                <% if attachment.file_size.present? %>
+                  • <%= ((attachment.file_size.to_f / 1024).round(1)) %> KB
+                <% end %>
+                <% if attachment.content_type.present? %>
+                  • <%= attachment.content_type %>
+                <% end %>
+              </div>
+            </div>
+            <div style="display:flex; gap:0.5rem;">
+              <a href="<%= attachment.file_path %>" target="_blank" rel="noopener noreferrer" class="btn btn-ghost btn-sm">Download</a>
+              <% if can_delete %>
+                <form action="/projects/<%= @project.id %>/attachments/<%= attachment.id %>" method="POST" onsubmit="return confirm('Delete this attachment?');">
+                  <input type="hidden" name="_method" value="DELETE">
+                  <button type="submit" class="btn btn-ghost btn-sm" style="color:var(--danger);">Delete</button>
+                </form>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="empty-content" style="text-align:center; padding:1rem 0;">
+        <p class="empty-text" style="color:var(--text-muted);">No attachments yet</p>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<!-- Discussions / Threads Section -->
+<div class="content-card" id="discussions" style="margin-top:1.5rem;">
+  <div class="card-header-section">
+    <h2 class="card-title">Discussions</h2>
+    <div style="display:flex; gap:0.75rem; align-items:center;">
+      <span class="card-badge"><%= @threads&.size || 0 %> <%= (@threads&.size || 0) == 1 ? "thread" : "threads" %></span>
+      <% if current_user.admin? || current_user.id == @project.user_id %>
+        <a href="/projects/<%= @project.id %>/threads/new" class="btn btn-sm btn-primary">New Thread</a>
+      <% end %>
+    </div>
+  </div>
+  <div class="card-content">
+    <% if @threads && @threads.any? %>
+      <div class="threads-list" style="display:flex; flex-direction:column; gap:0.75rem;">
+        <% @threads.each do |thread| %>
+          <a href="/projects/<%= @project.id %>/threads/<%= thread.id %>" class="thread-item" style="display:block; padding:0.75rem 1rem; border-radius:var(--radius-lg); border:1px solid var(--border); background:var(--bg-secondary); text-decoration:none; color:inherit;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+              <div>
+                <div style="display:flex; align-items:center; gap:0.5rem;">
+                  <% if thread.pinned %>
+                    <span class="card-badge" style="background:rgba(59,130,246,0.1); color:var(--primary-light);">Pinned</span>
+                  <% end %>
+                  <h3 style="margin:0; font-size:1rem;"><%= h(thread.title) %></h3>
+                </div>
+                <% if thread.description.present? %>
+                  <p style="margin:0.25rem 0 0.35rem; font-size:0.9rem; color:var(--text-secondary);">
+                    <%= h(thread.description) %>
+                  </p>
+                <% end %>
+                <div style="font-size:0.8rem; color:var(--text-muted);">
+                  Started by <%= h(thread.user.username) %> • <%= time_ago(thread.created_at) %> • <%= thread.messages.size %> <%= thread.messages.size == 1 ? "message" : "messages" %>
+                  <% if thread.locked %>
+                    • Locked
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          </a>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="empty-content" style="text-align:center; padding:1rem 0;">
+        <p class="empty-text" style="color:var(--text-muted);">No discussions yet</p>
+      </div>
+    <% end %>
+  </div>
+</div>
+
 <!-- Comments Section with Unread Tracking -->
 <div class="content-card" id="comments">
   <div class="card-header-section">

@@ -1,0 +1,59 @@
+<!-- Breadcrumb Navigation -->
+<nav class="breadcrumb" aria-label="Breadcrumb">
+  <a href="/">Home</a>
+  <span class="breadcrumb-separator">/</span>
+  <a href="/projects">Projects</a>
+  <span class="breadcrumb-separator">/</span>
+  <a href="/projects/<%= @project.id %>"><%= h(@project.name) %></a>
+  <span class="breadcrumb-separator">/</span>
+  <a href="/projects/<%= @project.id %>/threads/<%= @thread.id %>"><%= h(@thread.title) %></a>
+  <span class="breadcrumb-separator">/</span>
+  <span class="breadcrumb-current">Edit Message</span>
+</nav>
+
+<div class="form-container">
+  <div style="text-align:center; margin-bottom:2rem;">
+    <h1>Edit Message</h1>
+    <p class="subtitle">Update your message in <strong><%= h(@thread.title) %></strong></p>
+  </div>
+
+  <form action="/projects/<%= @project.id %>/threads/<%= @thread.id %>/messages/<%= @message.id %>" method="POST" class="form">
+    <input type="hidden" name="_method" value="PUT">
+
+    <div class="form-group">
+      <label for="content">Message</label>
+      <textarea
+        id="content"
+        name="message[content]"
+        class="form-control"
+        rows="6"
+        required
+        style="resize:vertical; min-height:120px;"><%= h(@message.content) %></textarea>
+    </div>
+
+    <div class="sidebar-card" style="margin-top:1.5rem; background:var(--card-bg-secondary, #f8f9fa);">
+      <h4 style="margin-bottom:0.5rem; font-size:0.9rem; color:var(--text-muted);">Message Information</h4>
+      <div class="info-list">
+        <div class="info-item">
+          <span>Author</span>
+          <span><%= h(@message.user.username) %></span>
+        </div>
+        <div class="info-item">
+          <span>Posted</span>
+          <span><%= @message.created_at.strftime("%b %d, %Y at %I:%M %p") %></span>
+        </div>
+        <% if @message.edited_at.present? %>
+          <div class="info-item">
+            <span>Last Edited</span>
+            <span><%= @message.edited_at.strftime("%b %d, %Y at %I:%M %p") %></span>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:1rem; margin-top:2rem;">
+      <button type="submit" class="btn btn-primary btn-block">Update Message</button>
+      <a href="/projects/<%= @project.id %>/threads/<%= @thread.id %>#message-<%= @message.id %>" class="btn btn-outline btn-block">Cancel</a>
+    </div>
+  </form>
+</div>
