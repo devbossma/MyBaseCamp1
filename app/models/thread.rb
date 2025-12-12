@@ -6,7 +6,7 @@ class ProjectThread < ActiveRecord::Base
 
   belongs_to :project
   belongs_to :user
-  has_many :messages, dependent: :destroy
+  has_many :messages, foreign_key: :thread_id, dependent: :destroy
 
   validates :title, presence: true
 

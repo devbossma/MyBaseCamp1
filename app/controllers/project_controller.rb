@@ -75,7 +75,8 @@ class ProjectController < ApplicationController
 
   get "/projects/:id" do
     @project = Project.find_by(id: params[:id])
-
+    halt 404 unless @project
+    halt 403, erb(:"errors/403") unless current_user.can_manage?(@project)
     if @project && current_user.can_manage?(@project)
       @comments = @project.comments.includes(:user).order(created_at: :desc)
       @attachments = @project.attachments.includes(:user).order(created_at: :desc)
@@ -89,17 +90,16 @@ class ProjectController < ApplicationController
 
   get "/projects/:id/edit" do
     @project = Project.find_by(id: params[:id])
+    halt 404 unless @project
+    halt 403, erb(:"errors/403") unless current_user.can_manage?(@project)
 
-    if @project && current_user.can_manage?(@project)
-      erb :"projects/edit"
-    else
-      flash[:error] = "Project not found or access denied"
-      redirect "/"
-    end
+    erb :"projects/edit"
   end
 
   put "/projects/:id" do
     @project = Project.find_by(id: params[:id])
+    halt 404 unless @project
+    halt 403, erb(:"errors/403") unless current_user.can_manage?(@project)
 
     if @project && current_user.can_manage?(@project)
       project_params = parse_project_params(params)
@@ -161,6 +161,8 @@ class ProjectController < ApplicationController
 
   delete "/projects/:id" do
     project = Project.find_by(id: params[:id])
+    halt 404 unless @project
+    halt 403, erb(:"errors/403") unless current_user.can_manage?(@project)
 
     if project && (current_user.admin? || project.user_id == current_user.id)
       project.destroy

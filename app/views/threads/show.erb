@@ -52,14 +52,17 @@
 <div class="content-card" id="messages">
   <div class="card-header-section">
     <h2 class="card-title">Messages</h2>
-    <span class="card-badge"><%= @messages.size %> <%= @@thread.messages.size == 1 ? "message" : "messages" %></span>
+    <span class="card-badge"><%= @messages.size %> <%= @messages.size == 1 ? "message" : "messages" %></span>
   </div>
 
   <div class="card-content">
     <% if @messages.any? %>
+      <% parents = @messages.select { |m| m.parent_message_id.nil? } %>
       <div class="comments-list" style="display:flex; flex-direction:column; gap:1rem;">
-        <% @messages.each do |message| %>
+        <% parents.each do |message| %>
+          <% replies = @messages.select { |m| m.parent_message_id == message.id } %>
           <% can_manage_message = current_user.admin? || current_user.id == @project.user_id || current_user.id == message.user_id %>
+
           <div id="message-<%= message.id %>" class="comment-item" style="display:flex; gap:0.75rem; padding:1rem; background:var(--bg-secondary); border-radius:var(--radius-lg); border:1px solid var(--border); scroll-margin-top:100px;">
             <div class="avatar-sm" style="flex-shrink:0;">
               <%= h(message.user.username[0].upcase) %>
@@ -77,20 +80,84 @@
                     <% end %>
                   </span>
                 </div>
-                <% if can_manage_message %>
-                  <div class="comment-actions" style="display:flex; gap:0.5rem;">
-                    <a href="/projects/<%= @project.id %>/threads/<%= @thread.id %>/messages/<%= message.id %>/edit" class="btn btn-ghost btn-sm" title="Edit message">Edit</a>
+
+                <div class="comment-actions" style="display:flex; gap:0.5rem;">
+                  <%# Reply button (any associated user) %>
+                  <% if current_user.can_manage?(@project) && !@thread.locked %>
+                    <button type="button" class="btn btn-ghost btn-sm" title="Reply" onclick="replyToMessage(<%= message.id %>, '<%= h(message.user.username) %>')">
+                      <i class="fa-solid fa-reply"></i>
+                    </button>
+                  <% end %>
+
+                  <% if can_manage_message %>
+                    <a href="/projects/<%= @project.id %>/threads/<%= @thread.id %>/messages/<%= message.id %>/edit" class="btn btn-ghost btn-sm" title="Edit message">
+                      <i class="fa-solid fa-pen"></i>
+                    </a>
                     <form action="/projects/<%= @project.id %>/threads/<%= @thread.id %>/messages/<%= message.id %>" method="POST" style="display:inline;" onsubmit="return confirm('Delete this message?');">
                       <input type="hidden" name="_method" value="DELETE">
-                      <button type="submit" class="btn btn-ghost btn-sm" style="color:var(--danger);" title="Delete message">Delete</button>
+                      <button type="submit" class="btn btn-ghost btn-sm" style="color:var(--danger);" title="Delete message">
+                        <i class="fa-solid fa-trash"></i>
+                      </button>
                     </form>
-                  </div>
-                <% end %>
+                  <% end %>
+                </div>
               </div>
 
               <div class="comment-body" style="color:var(--text-secondary); line-height:1.6; word-wrap:break-word;">
                 <%= simple_format(h(message.content)) %>
               </div>
+
+              <% if replies.any? %>
+                <div class="replies" style="margin-top:0.75rem; display:flex; flex-direction:column; gap:0.75rem; padding-left:1rem; border-left:2px solid var(--border);">
+                  <% replies.each do |reply| %>
+                    <% can_manage_reply = current_user.admin? || current_user.id == @project.user_id || current_user.id == reply.user_id %>
+                    <div id="message-<%= reply.id %>" class="reply-item" style="display:flex; gap:0.75rem; padding:0.75rem; background:var(--bg-primary); border-radius:var(--radius-lg); border:1px solid var(--border);">
+                      <div class="avatar-xs" style="flex-shrink:0; width:28px; height:28px; border-radius:999px; display:flex; align-items:center; justify-content:center; background:rgba(59,130,246,0.12); color:var(--primary-light); font-weight:700;">
+                        <%= h(reply.user.username[0].upcase) %>
+                      </div>
+                      <div style="flex:1; min-width:0;">
+                        <div style="display:flex; justify-content:space-between; gap:0.75rem; align-items:flex-start;">
+                          <div>
+                            <a href="/profile/<%= reply.user.id %>" style="font-weight:600; color:var(--text-primary); text-decoration:none;">
+                              <%= h(reply.user.username) %>
+                            </a>
+                            <span style="color:var(--text-muted); font-size:0.8rem; margin-left:0.5rem;">
+                              <%= time_ago(reply.created_at) %>
+                              <% if reply.edited_at.present? %>
+                                <span style="font-style:italic;">(edited)</span>
+                              <% end %>
+                            </span>
+                          </div>
+
+                          <div style="display:flex; gap:0.4rem;">
+                            <% if current_user.can_manage?(@project) && !@thread.locked %>
+                              <button type="button" class="btn btn-ghost btn-sm" title="Reply" onclick="replyToMessage(<%= reply.id %>, '<%= h(reply.user.username) %>', <%= message.id %>)">
+                                <i class="fa-solid fa-reply"></i>
+                              </button>
+                            <% end %>
+
+                            <% if can_manage_reply %>
+                              <a href="/projects/<%= @project.id %>/threads/<%= @thread.id %>/messages/<%= reply.id %>/edit" class="btn btn-ghost btn-sm" title="Edit reply">
+                                <i class="fa-solid fa-pen"></i>
+                              </a>
+                              <form action="/projects/<%= @project.id %>/threads/<%= @thread.id %>/messages/<%= reply.id %>" method="POST" style="display:inline;" onsubmit="return confirm('Delete this reply?');">
+                                <input type="hidden" name="_method" value="DELETE">
+                                <button type="submit" class="btn btn-ghost btn-sm" style="color:var(--danger);" title="Delete reply">
+                                  <i class="fa-solid fa-trash"></i>
+                                </button>
+                              </form>
+                            <% end %>
+                          </div>
+                        </div>
+
+                        <div style="color:var(--text-secondary); line-height:1.55; word-wrap:break-word; margin-top:0.35rem;">
+                          <%= simple_format(h(reply.content)) %>
+                        </div>
+                      </div>
+                    </div>
+                  <% end %>
+                </div>
+              <% end %>
             </div>
           </div>
         <% end %>
@@ -118,6 +185,16 @@
         <p class="empty-text" style="color:var(--text-muted);">This thread is locked. No new messages can be posted.</p>
       <% else %>
         <form action="/projects/<%= @project.id %>/threads/<%= @thread.id %>/messages" method="POST" class="comment-form">
+          <input type="hidden" name="message[parent_message_id]" id="parent_message_id" value="">
+          <input type="hidden" name="message[reply_to_message_id]" id="reply_to_message_id" value="">
+
+          <div id="reply-banner" style="display:none; margin-bottom:0.75rem; padding:0.5rem 0.75rem; border:1px solid var(--border); border-radius:var(--radius-lg); background:rgba(59,130,246,0.06); color:var(--text-secondary);">
+            Replying to <span id="replying-to" style="font-weight:700;"></span>
+            <button type="button" class="btn btn-ghost btn-sm" style="float:right;" onclick="clearReply()" title="Cancel reply">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+
           <div class="comment-input-wrapper" style="display:flex; gap:0.75rem;">
             <div class="avatar-sm" style="flex-shrink:0;">
               <%= current_user.username[0].upcase %>
@@ -125,6 +202,7 @@
             <div style="flex:1;">
               <textarea
                 name="message[content]"
+                id="message_content"
                 placeholder="Write your message..."
                 class="form-control"
                 rows="4"
@@ -136,6 +214,42 @@
             </div>
           </div>
         </form>
+
+        <script>
+          function replyToMessage(replyToId, username, parentId) {
+            const banner = document.getElementById('reply-banner');
+            const replyingTo = document.getElementById('replying-to');
+            const parentInput = document.getElementById('parent_message_id');
+            const replyToInput = document.getElementById('reply_to_message_id');
+            const textarea = document.getElementById('message_content');
+
+            // parentId is optional: if replying to a parent message => parentId is undefined
+            parentInput.value = parentId ? String(parentId) : String(replyToId);
+            replyToInput.value = String(replyToId);
+            replyingTo.textContent = '@' + username;
+            banner.style.display = 'block';
+
+            // Prefill with @username (requirement)
+            const prefix = '@' + username + ' ';
+            if (!textarea.value.startsWith(prefix)) {
+              // remove any previous @mention at start, then add ours
+              textarea.value = prefix + textarea.value.replace(/^@\w+\s+/, '');
+            }
+
+            textarea.focus();
+            textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+
+            // Scroll to composer
+            document.getElementById('new-message').scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+
+          function clearReply() {
+            document.getElementById('parent_message_id').value = '';
+            document.getElementById('reply_to_message_id').value = '';
+            document.getElementById('reply-banner').style.display = 'none';
+            document.getElementById('replying-to').textContent = '';
+          }
+        </script>
       <% end %>
     </div>
   </div>

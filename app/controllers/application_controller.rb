@@ -53,7 +53,7 @@ class ApplicationController < Sinatra::Base
 
     def require_admin
       unless current_user&.admin?
-        redirect_with_flash("/", :error, "Admin access required")
+        halt 403, erb(:"errors/403")
       end
     end
 
@@ -108,14 +108,14 @@ class ApplicationController < Sinatra::Base
   end
 
   error do
-    erb :"errors/500"
-  rescue
-    "500 - Internal Server Error"
-  end
-
-  error do
     erb :"errors/403"
   rescue
     "403 - You do not have permission to view this page. Not an admin"
+  end
+
+  error do
+    erb :"errors/500"
+  rescue
+    "500 - Internal Server Error"
   end
 end
