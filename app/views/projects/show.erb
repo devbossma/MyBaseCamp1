@@ -236,7 +236,9 @@
               <div>
                 <div style="display:flex; align-items:center; gap:0.5rem;">
                   <% if thread.pinned %>
-                    <span class="card-badge" style="background:rgba(59,130,246,0.1); color:var(--primary-light);">Pinned</span>
+                    <span class="card-badge" style="background:rgba(59,130,246,0.1); color:var(--primary-light);"><i class="fa-solid fa-thumbtack"></i>Pinned</span>
+                  <% elsif thread.locked%>
+                    <span class="status-badge status-inactive"><i class="fa-solid fa-lock"></i>Locked</span>  
                   <% end %>
                   <h3 style="margin:0; font-size:1rem;"><%= h(thread.title) %></h3>
                 </div>
@@ -247,9 +249,6 @@
                 <% end %>
                 <div style="font-size:0.8rem; color:var(--text-muted);">
                   Started by <%= h(thread.user.username) %> • <%= time_ago(thread.created_at) %> • <%= thread.messages.size %> <%= thread.messages.size == 1 ? "message" : "messages" %>
-                  <% if thread.locked %>
-                    • Locked
-                  <% end %>
                 </div>
               </div>
             </div>

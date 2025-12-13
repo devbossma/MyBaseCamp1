@@ -28,6 +28,10 @@ class User < ActiveRecord::Base
     admin? || project.user_id == id || project.assigned_users.exists?(id)
   end
 
+  def can_manage_message?(message)
+    message.user_id = id
+  end
+
   def can_manage_profile?(profile)
     admin? || profile.user_id == id
   end
