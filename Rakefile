@@ -11,7 +11,7 @@ task :server do
 end
 
 desc "Start simple server (no auto-reload)"
-task :simple_server do
+task :local_server do
   sh "bundle exec puma -p 4567 config.ru"
 end
 

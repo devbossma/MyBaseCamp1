@@ -1,0 +1,27 @@
+version: '3.8'
+services:
+  # Development Service (for local coding with auto-reload)
+  web_dev:
+    build: .
+    volumes:
+      - .:/usr/src/app                    # Mounts code for live changes
+      - ./db/${RACK_ENV:-development}.sqlite3:/usr/src/app/db/${RACK_ENV:-development}.sqlite3
+    ports:
+      - "4567:4567"
+    environment:
+      - RACK_ENV=development
+    command: bundle exec rake local_server     # Uses rerun for auto-reload
+    stdin_open: true
+    tty: true
+
+  # Production-Style Service (simulates EC2 deployment)
+  web_prod:
+    build: .
+    volumes:
+      # Only mount the database, NOT the code
+      - ./db/${RACK_ENV}.sqlite3:/usr/src/app/db/${RACK_ENV}.sqlite3
+    ports:
+      - "8080:8080"                       # Different port to avoid conflict
+    environment:
+      - RACK_ENV=production
+    # Uses ENTRYPOINT script from Dockerfile (runs migrations then starts server)

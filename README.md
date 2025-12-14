@@ -110,12 +110,6 @@ Follow these steps to set up MyBaseCamp1 on your local machine:
 git clone https://github.com/devbossma/MyBaseCamp1.git
 
 cd MyBaseCamp1
-
-# Qwasar Git
-git clone https://git.us.qwasar.io/my_basecamp_1_196696_risitv/my_basecamp_1.git
-
-cd ./my_basecamp_1
-
 ```
 
 ### Step 2: Install Dependencies
