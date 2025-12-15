@@ -1,13 +1,8 @@
 # Environment variables
 .env
-.env.local
-.env.*.local
 
 # Database files
 db/*.sqlite3
-db/*.sqlite3-*
-db/seed.sqlite3
-db/test.sqlite3
 
 # Uploads (user-generated content)
 public/uploads/**/*
