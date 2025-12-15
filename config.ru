@@ -5,12 +5,18 @@ if ActiveRecord::Base.connection.migration_context.needs_migration?
 end
 
 use Rack::MethodOverride
-run ApplicationController
-use AuthController
-use ProjectController
-use CommentController
-use AttachmentController
-use ThreadController
-use MessageController
-use AdminController
-use UserController
+
+# Compose modular Sinatra apps.
+# Rack::Cascade will try each app in order and only stop when a request is handled
+# (i.e., response status not in [404, 405]). This avoids "first app returns 404" issues.
+run Rack::Cascade.new([
+  AuthController.new,
+  ProjectController.new,
+  CommentController.new,
+  AttachmentController.new,
+  ThreadController.new,
+  MessageController.new,
+  AdminController.new,
+  UserController.new,
+  ApplicationController.new
+])

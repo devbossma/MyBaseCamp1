@@ -1,20 +1,24 @@
-FROM ruby:3.2-alpine
+# Base image
+FROM ruby:3.3.10-slim
 
-# Install system dependencies
-RUN apk add --no-cache build-base sqlite-dev nodejs tzdata sqlite-libs
+# Install only production system dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libsqlite3-dev \
+    sqlite3 \
+    && rm -rf /var/lib/apt/lists/*
 
 # Set application directory
-ENV APP_ROOT /usr/src/app
+ENV APP_ROOT=/usr/src/app
 RUN mkdir -p $APP_ROOT
 WORKDIR $APP_ROOT
 
-# Install gems first for better layer caching
+# Install ONLY production gems
 COPY Gemfile Gemfile.lock ./
-RUN bundle config set force_ruby_platform true && \
-    bundle config set without 'development test' && \
-    bundle install --jobs 4 --retry 5 --verbose
+RUN bundle config set without 'development test' && \
+    bundle install --jobs 4 --retry 5
 
-# Copy the rest of the application
+# Copy application code
 COPY . .
 
 # Copy and set the entrypoint script
@@ -24,7 +28,11 @@ RUN chmod +x /usr/bin/docker-entrypoint.sh
 # Set the entrypoint to handle migrations
 ENTRYPOINT ["docker-entrypoint.sh"]
 
-# Expose both ports (development:4567, production:8080)
-EXPOSE 4567 8080
-# Default command will be overridden by docker-compose or uses simple_server
+# Set production environment
+ENV RACK_ENV=production
+
+# Expose production
+EXPOSE 8080
+
+# Production command
 CMD ["bundle", "exec", "rake", "server"]

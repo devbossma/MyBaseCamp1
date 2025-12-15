@@ -17,6 +17,7 @@ GEM
     bigdecimal (3.3.1)
     coderay (1.1.3)
     concurrent-ruby (1.3.5)
+    dotenv (3.2.0)
     ffi (1.17.2-x86_64-linux-gnu)
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
@@ -26,7 +27,6 @@ GEM
       rb-inotify (~> 0.9, >= 0.9.10)
     logger (1.7.0)
     method_source (1.1.0)
-    mini_portile2 (2.8.9)
     minitest (5.26.2)
     mustermann (3.0.4)
       ruby2_keywords (~> 0.0.1)
@@ -62,8 +62,6 @@ GEM
     sinatra-activerecord (2.0.28)
       activerecord (>= 4.1)
       sinatra (>= 1.0)
-    sqlite3 (1.7.3)
-      mini_portile2 (~> 2.8.0)
     sqlite3 (1.7.3-x86_64-linux)
     tilt (2.6.1)
     tzinfo (2.0.6)
@@ -71,13 +69,13 @@ GEM
     zeitwerk (2.7.3)
 
 PLATFORMS
-  ruby
   x86_64-linux
 
 DEPENDENCIES
   activerecord (~> 6.1.0)
   bcrypt
   bigdecimal
+  dotenv
   json
   mutex_m
   pry

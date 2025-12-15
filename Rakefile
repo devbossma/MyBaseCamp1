@@ -4,7 +4,7 @@ require "sinatra/activerecord/rake"
 desc "Start the application"
 task :server do
   if ENV["RACK_ENV"] == "production"
-    sh "bundle exec puma -p 8080 config.ru"
+    sh "bundle exec puma -b tcp://0.0.0.0:8080 config.ru"
   else
     sh "bundle exec rerun --background --ignore 'db/*' --ignore 'log/*' --pattern '**/*.{rb,ru,erb}' 'bundle exec puma -p 4567 config.ru'"
   end

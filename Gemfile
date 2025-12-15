@@ -10,6 +10,7 @@ gem "puma"
 gem "mutex_m"
 gem "bigdecimal"
 gem "json"
+gem "dotenv", groups: [:development, :test]
 
 # Use compatible ActiveRecord version
 gem "activerecord", "~> 6.1.0"

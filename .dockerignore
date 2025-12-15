@@ -1,0 +1,57 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+README.md
+screenshots/
+*.md
+
+# Development files
+.env
+.env.local
+.env.*.local
+
+# Database files (will be created in container)
+db/*.sqlite3
+db/*.sqlite3-*
+db/seed.sqlite3
+db/test.sqlite3
+
+# Uploads (will be in volumes)
+public/uploads/**/*
+!public/uploads/.gitkeep
+
+# Logs
+log/*.log
+tmp/
+
+# Docker files (already in image)
+Dockerfile
+.dockerignore
+docker-compose.yml
+docker-compose.*.yml
+
+# CI/CD
+.github/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Ruby/Bundle (will be installed fresh)
+.bundle/
+vendor/bundle/
+
+# Test files
+spec/
+test/
+coverage/
